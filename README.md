@@ -23,10 +23,10 @@ Transcription activator-like effector nucleases (TALENs) is a genetic engineerin
 1. *prereq/*: prerequisite inputs such as retrieval and storage of TRegGA assembled contigs; retrieval and storage of reference genomes, preparation of BLAST+ database for reference genome.
 2. *doc/*: reference and tutorial documents.
 3. *bin/*: ancillary codes and scripts.
-4. *run/*: main scripts and execution results.
-5. *data/*: final outputs and reports.
+4. *src/*: prerequisite softwares
+5. *run/*: main scripts and execution results.
+6. *data/*: final outputs and reports.
 
 ## Notes: 
 1. The workflow default to run a test case using 10% contigs from rice cultivar Zhengshan97 against reference rice Japponica Chr10. 
 2. The run time for whole genome blat of a typical 3kRGP rice cultivar contigs against reference rice Japonica takes about 90-100 hrs on Mason, so plan carefully for submitting the job `x1-WGblat`.
-3. Make sure blast+ is in your PATH: */N/dc2/projects/brendelgroup/TRegGA/bin*
