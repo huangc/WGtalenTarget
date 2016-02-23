@@ -65,7 +65,7 @@ mv cutils/ bcutils/
 cd bcutils/
 make
 
-# fix talesf and talesf-paired makefiles for LD_LIBRARY_PATH error
+# fix talesf and talesf-paired makefiles for library file linking issues
 cd ${src_DIR}/tale_nt2/talesf
 sed -i 's/gcc -fmax/gcc -I . -L . -L bcutils -fmax/' makefile
 make
