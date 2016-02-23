@@ -35,7 +35,7 @@ tar -xzf ncbi-blast-2.3.0+-x64-linux.tar.gz
 export PATH=$PATH:${src_DIR}/blast//ncbi-blast-2.3.0+/bin
 ```
 
-### paired TALEN Target Finder
+### Paired TALEN Target Finder
 * See https://github.com/boglab/talesf/tree/paired
 * Last update: Sep. 2015
 ```bash
