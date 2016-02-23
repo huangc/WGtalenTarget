@@ -57,10 +57,34 @@ NUM_THREADS=4
 # GAPOPEN=4
 # GAPEXTEND=1
 
-# blat
+## blat
 # Add blat directory to the PATH
 # export PATH=$PATH:${src_DIR}/blatSuite
 PERC_IDENTITY=99
 MIN_SCORE=250
 GAP_MINNUM=0 #Minimal number of gaps, more than and not including this number.
 GAP_MINSIZE=100 #Minimal size of total gaps, more than and not including this number.
+
+## TALE-NT2 target finder
+export PATH=$PATH:${src_DIR}/tale_nt2/talesf-paired
+# PTALEN is a list of paired TALEN RVD sequences
+PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
+#  Options:
+#    -c|--cupstream        sets the allowed upstream bases; 0 for T only, 1 for C only, 2 for either
+#    -d|--dimer            sets types of dimer targets to search for; 0 for both homo and heterodimers, 
+#                          1 for heterodimers only, 2 for homodimers only
+#    -m|--min              the minimum allowed spacer size; default is 15
+#    -n|--numprocs         the number of processors to use; default is 1
+#    -o|--outfile          template filename to which output will be written; 
+#                          both a tab-delimited file and gff3 file will be produced
+#    -x|--max              the maximum allowed spacer size; default is 30
+#    -t|--cutoffmult       multiple of best score at which potential sites will be filtered; default is 3.0
+TPO_m=15
+TPO_x=30
+TPO_n=4
+TPO_t=3
+# PTALEN_LEN and PTALEN_INDEL are parameters to define the overlapping range between ptalen site and deletin site.
+PTALEN_LEN=60 #the average size (bp) of paired TALEN binding site from edge to edge and including the spacer.
+PTALEN_INDEL=100 #the distance (bp) from the near edge of pTALEN to the near edge of indel. This is used to define how close \
+# the pTALEN is to the indel to be called "overlapping".
+
