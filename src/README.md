@@ -39,6 +39,7 @@ export PATH=$PATH:${src_DIR}/blast//ncbi-blast-2.3.0+/bin
 * See https://github.com/boglab/talesf/tree/paired
 * Last update: Sep. 2015
 ```bash
+module load gcc
 cd ${src_DIR}
 mkdir -p tale_nt2
 cd tale_nt2
@@ -51,7 +52,6 @@ git clone https://github.com/boglab/cutils.git
 \rm -r bcutils/
 mv cutils/ bcutils/
 cd bcutils/
-# module load gcc
 make
 
 # download the paired target finder
