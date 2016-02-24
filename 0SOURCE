@@ -68,8 +68,6 @@ VMEM=40
 ## TALE-NT2 target finder
 # Add target finder to the PATH
 export PATH=$PATH:${src_DIR}/tale_nt2/talesf-paired
-# PTALEN is a list of paired TALEN RVD sequences
-PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 #  Options:
 #    -c|--cupstream        sets the allowed upstream bases; 0 for T only, 1 for C only, 2 for either
 #    -d|--dimer            sets types of dimer targets to search for; 0 for both homo and heterodimers, 
@@ -85,9 +83,13 @@ TPO_x=30
 TPO_n=4
 TPO_t=3
 
+## PTALEN is a list of paired TALEN RVD sequences to be subject to the Target finder analysis.
+# The RVD sequences are defined in PREREQ.sh file
+PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
+
 ## Association of pTALEN and deletion sites
 # In the result of Blat analysis (psl file), the pairwise sequence alignments are described as connected blocks.
-# The gap between blocks could be used to look for the gap caused by pTALEN binding.
+# The gap between blocks are used here to infer the gap due to pTALEN binding.
 # A pTALEN binding site and a deletion site is called associated if the pTALEN site is within 
 # ${PTALEN_INDEL} bp from the deletion site.
 # |----------------------------------blk1-----------------------------|   |--------blk2--------|   |-----blk3----|
@@ -95,8 +97,9 @@ TPO_t=3
 # Bad candidate    |--ptalen1--| |--ptalen2--|
 #                  |<-----PTALEN_LEN-------->||<----PTALEN-INDEL----->|
 ## PTALEN_LEN and PTALEN_INDEL are parameters to define the association between pTALEN site and deletion site.
-# the average size (bp) of paired TALEN binding site from edge to edge and including the spacer.
+# Good candidate gap for pTALEN associated deletion would have small PTALEN_INDEL value.
+# PTALEN_LEN: the average size (bp) of paired TALEN binding site from edge to edge and including the spacer.
 PTALEN_LEN=60 
-# the distance (bp) from the near edge of pTALEN to the near edge of deletion site. 
+# PTALEN_INDEL: the distance (bp) from the near edge of pTALEN to the near edge of deletion site. 
 PTALEN_INDEL=100 
 
