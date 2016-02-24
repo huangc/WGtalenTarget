@@ -27,11 +27,13 @@ source ./0SOURCE
 cd ${run_DIR}
 
 #0. Prerequisite files
-# File Seq.t_Lg${GAP_MINSIZE}.table from x2-WGindelT with content: "Tname tGapStart tGapSize Samples" 
-# TALEN RVD sequence
+# Deletion summary table: data/Seq.t_Lg${GAP_MINSIZE}.table, generated from x2-WGindelT with the content:
+# "Tname tGapStart tGapSize Samples" 
+# TALEN RVD sequences: prereq/pTALEN_*, generated from PREREQ.sh with the content: 
+# '"rvdseq1" "rvdseq2"'
 
 #-----
-#2. Make TALE-NT2 prediction of paied-TALEN binding sites on iLOCUS.
+#1. Make TALE-NT2 prediction of paied-TALEN binding sites on REFSEQ
 #
 mkdir -p ptalen
 cd ptalen
@@ -54,31 +56,29 @@ done
 sh pairedtalesf.sh
 
 #-----
-#3. Extract sequences of iLoci that contain paired TALENs (pTALEN).
+#2. Extract sequences of iLoci that contain paired TALENs (pTALEN).
 #
-mkdir -p ${ptalen_DIR}
-cd ${ptalen_DIR}
+# mkdir -p ${ptalen_DIR}
+# cd ${ptalen_DIR}
 # get the locus list that contains pTALEN
-\rm pTALEN.locus
-for p in ${PTALEN}
-do
-tail -n +4 ${ptalen_DIR}/pairedtalesf.${p}-on-${ILOCUSNAME}.txt | awk '{ print $1 }' >> pTALEN.locus
-done
+# \rm pTALEN.locus
+# for p in ${PTALEN}
+# do
+# tail -n +4 ${ptalen_DIR}/pairedtalesf.${p}-on-${ILOCUSNAME}.txt | awk '{ print $1 }' >> pTALEN.locus
+# done
 
 # Sort by first column starting on 6th character (-k1.6) and then sort numerically (-n).
-sort -k1.6 -n pTALEN.locus | uniq > pTALEN.locus.sorted
+# sort -k1.6 -n pTALEN.locus | uniq > pTALEN.locus.sorted
 
 # Extract sequence from OsjLOCUS database using "-entry_batch": Input file for batch processing, entries must be provided one per line.
-blastdbcmd -db ${ilocus_DIR}/${DB_ILOCUS} -entry_batch pTALEN.locus.sorted -outfmt "%f" > ${ILOCUSSEQ_PTALEN}
+# blastdbcmd -db ${ilocus_DIR}/${DB_ILOCUS} -entry_batch pTALEN.locus.sorted -outfmt "%f" > ${ILOCUSSEQ_PTALEN}
 # Format the sequences for easier use in subsequent programs:
-sed -i -e "s/>lcl|/>/" ${ILOCUSSEQ_PTALEN}
-makeblastdb -in ${ILOCUSSEQ_PTALEN} -dbtype nucl -out ${DB_PTALEN} -parse_seqids
-
+# sed -i -e "s/>lcl|/>/" ${ILOCUSSEQ_PTALEN}
+# makeblastdb -in ${ILOCUSSEQ_PTALEN} -dbtype nucl -out ${DB_PTALEN} -parse_seqids
 
 ##-----
-#6. Generate the join table of iLoci that contain both pTALEN (#3) and indels (#5).
-#
-# and their distance is within 100 bp (or defined by the variable ${PTALEN_INDEL}).
+#2. Generate the join table that contain the associated pTALEN and indels, 
+# which has their distance within ${PTALEN_INDEL} bp.
 # use awk to extract the following: ilocus_id, start, end
 #blat.${DB_PTALEN}.${QUERYNAME}.Reps.psl.awk at fields $14, $16, $17
 
