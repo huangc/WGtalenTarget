@@ -12,9 +12,9 @@ Transcription activator-like effector nucleases (TALENs) is a genetic engineerin
 ## Workflow execution:
 1. Edit and setup the parameters as described in 0SOURCE, then `source 0SOURCE`
 2. Edit and prepare for the prerequisite files and softwares as described in PREREQ.sh, then `sh PREREQ.sh`
-3. Submit qsub script for whole genome blat alignment on Mason: `qsub x1-WGblat`
-4. Generate and submit qsub script for whole genome indel analysis on Mason: `sh x2-WGindelT`
-5. Submit qsub script for TALE-NT2 target finder on Mason: `qsub x3-WGptalen`
+3. Generate and submit qsub script for whole genome blat alignment on Mason: `sh x1-WGblat`
+4. Submit qsub script for whole genome indel analysis on Mason: `qsub x2-WGindelT`
+5. Submit qsub script for TALE-NT2 target finder on Mason: `qsub x3-WGtalen`
 6. Find main outputs in *data/*.
 6. Cleanup files with `sh xcleanup`
 
