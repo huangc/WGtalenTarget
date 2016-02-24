@@ -96,8 +96,8 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 # ${PTALEN_INDEL} bp from the deletion site.
 
 # |----------------------------------blk1-----------------------------|   |--------blk2--------|   |-----blk3----|
-# Good candidate                                           |--ptalen1--| |--ptalen2--|
-# Bad candidate    |--ptalen1--| |--ptalen2--|
+# Good candidate                                           |--rvdseq1--| |--rvdseq2--|
+# Bad candidate    |--rvdseq1--| |--rvdseq2--|
 #                  |<-----PTALEN_LEN-------->||<----PTALEN-INDEL----->|
 
 ## PTALEN_LEN and PTALEN_INDEL are parameters to define the association between pTALEN site and deletion site.
