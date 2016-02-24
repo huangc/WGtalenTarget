@@ -1,0 +1,384 @@
+#!/bin/bash
+#PBS -m abe
+#PBS -l nodes=1:ppn=20,vmem=20gb,walltime=1:00:00
+#PBS -N WGtalen
+#PBS -j oe
+
+module add python
+module add blat
+
+# Aims: To investigate the Whole-Genome (WG) insertion/deletion (indel) profile of rice genomic samples under TALEN treatment.
+# Author: Chun-Yuan Huang, Ph.D.
+# Last Update: 2/22/2016
+
+##-------------------------------------------
+## Workflow description:
+#1. WG paired TALEN binding sites prediction using TALE-NT2 targetter
+#3. Extract sequences of iLoci that contain paired TALENs (pTALEN).
+#4. Blat of sample contigs against pTALEN (pTALEN from #3, sample contigs were assembled according to TRegGA workflow).
+#5. Generate filtered blat hits table (#4) for contigs that contain gaps whose total length larger than the defined size (4 bp).
+#6. Generate the join table of iLoci that contain both pTALEN (#3) and indels (#5).
+#7. Narrow down the #6 iLoci hits whose pTALEN (#3) is within the defined distance (100 bp) from the indel region (#5).
+#8. Extract the blat alignemnts (#4) according to the #7 iLoci hits for final inspection.
+
+
+cd $PBS_O_WORKDIR
+source ./0SOURCE
+cd ${run_DIR}
+
+#0. Prerequisite files
+# File Seq.t_Lg${GAP_MINSIZE}.table from x2-WGindelT with content: "Tname tGapStart tGapSize Samples" 
+# TALEN RVD sequence
+
+#-----
+#2. Make TALE-NT2 prediction of paied-TALEN binding sites on iLOCUS.
+#
+mkdir -p ptalen
+cd ptalen
+\rm pairedtalesf.sh
+cp -s ${prereq_DIR}/pTALEN* .
+for p in ${PTALEN}
+do
+echo "
+#!/usr/bin/bash
+${PTALEN_DIR}/pairedtalesf \
+        -m ${TPO_m} \
+        -x ${TPO_x} \
+        -n ${TPO_n} \
+        -t ${TPO_t} \
+        -o pairedtalesf.${p}-on-${ILOCUSNAME} \
+        ${ilocus_DIR}/${ILOCUSSEQ} \
+        "`cat ${p}`"
+" >> pairedtalesf.sh
+done
+sh pairedtalesf.sh
+
+
+#-----
+#3. Extract sequences of iLoci that contain paired TALENs (pTALEN).
+#
+mkdir -p ${ptalen_DIR}
+cd ${ptalen_DIR}
+# get the locus list that contains pTALEN
+\rm pTALEN.locus
+for p in ${PTALEN}
+do
+tail -n +4 ${ptalen_DIR}/pairedtalesf.${p}-on-${ILOCUSNAME}.txt | awk '{ print $1 }' >> pTALEN.locus
+done
+
+# Sort by first column starting on 6th character (-k1.6) and then sort numerically (-n).
+sort -k1.6 -n pTALEN.locus | uniq > pTALEN.locus.sorted
+
+# Extract sequence from OsjLOCUS database using "-entry_batch": Input file for batch processing, entries must be provided one per line.
+blastdbcmd -db ${ilocus_DIR}/${DB_ILOCUS} -entry_batch pTALEN.locus.sorted -outfmt "%f" > ${ILOCUSSEQ_PTALEN}
+# Format the sequences for easier use in subsequent programs:
+sed -i -e "s/>lcl|/>/" ${ILOCUSSEQ_PTALEN}
+makeblastdb -in ${ILOCUSSEQ_PTALEN} -dbtype nucl -out ${DB_PTALEN} -parse_seqids
+
+
+##-----
+#6. Generate the join table of iLoci that contain both pTALEN (#3) and indels (#5).
+#
+# and their distance is within 100 bp (or defined by the variable ${PTALEN_INDEL}).
+# use awk to extract the following: ilocus_id, start, end
+#blat.${DB_PTALEN}.${QUERYNAME}.Reps.psl.awk at fields $14, $16, $17
+
+# pairedtalesf.${PTALEN}-on-${ILOCUSNAME} at field $1, ${{PATLEN}, $2, $3, $4, $5, $6, $7, $8, $9, $10
+#Sequence_Name ${PTALEN} TAL_1 TAL_2 TAL_1_Score TAL_2_Score TAL_1_Start TAL_2_Start Spacer_Length TAL_1_Target TAL_2_Target
+# add the ${PTALEN} to the above
+# change the TAL_Target such that "T TCCTGAAGAATTGATTCACTTC" becomes "TTCCTGAAGAATTGATTCACTTC"
+mkdir -p ${blat_gap_ptalen_DIR}
+cd ${blat_gap_ptalen_DIR}
+\rm pairedtalesf.pTALEN-on-${ILOCUSNAME}.irange
+for p in ${PTALEN}
+do
+sed -r 's/\bT\s/T/g' ${ptalen_DIR}/pairedtalesf.${p}-on-${ILOCUSNAME}.txt | awk -v Rvd=${p} '{ FS="\t"; OFS="\t"; print $1,$6,$7,$8,$9,$10,$2,$3,$4\
+,$5,Rvd }' | tail -n+4 >> pairedtalesf.pTALEN-on-${ILOCUSNAME}.irange
+done
+sort -k 1,1 pairedtalesf.pTALEN-on-${ILOCUSNAME}.irange > pairedtalesf.pTALEN.irange
+
+
+for i in ${SAMPLE}
+do
+QUERY=${i}-${SEQ}
+QUERYNAME=${i}.${SEQNAME}
+# use awk to extract the following: ilocus_id, start, end
+awk '{ FS="\t"; OFS="\t"; print $14,$16,$17 }' ${blat_gap_DIR}/blat.${DB_PTALEN}.${QUERYNAME}.Reps.psl.awk | sort -k 1,1 > blat.${DB_PTALEN}.${QUER\
+YNAME}.irange
+# join based on the ilocus_id to have ilocus_id, ilocus_start, ilocus_end, TALEN1_start, TALEN2_start, Spacer_Length, TAL_1_Target, TAL_2_Target, T\
+AL_1, TAL_2, TAL_1_Score, TAL_2_Score, pTALEN
+join -1 1 -2 1 blat.${DB_PTALEN}.${QUERYNAME}.irange pairedtalesf.pTALEN.irange > blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join
+# arrange the column such that ilocus_start < ilocus_end, and TALEN1_start < TALEN2_start.
+awk '{ OFS="\t"; if ($2>$3) print $1,$3,$2,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13; else print $0 }' blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join |\
+awk '{ OFS="\t"; if ($4>$5) print $1,$2,$3,$5,$4,$6,$7,$8,$9,$10,$11,$12,$13; else print $0 }' > blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.tmp && \
+\
+\mv blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.tmp blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join
+
+## use awk to find ilocus that overlap (within the ranges of 100 bp; note that the range of talesfpaired is small, normally within 60 bp.
+awk -v Plen=${PTALEN_LEN} -v Pdel=${PTALEN_INDEL} '{ OFS="\t"; if ($4<$2 && ($2-$4)<(Plen+Pdel)) print $0 ; \
+else if ($4>=$2 && $4<$3) print $0; else if ($4>=$3 && ($4-$3)<Pdel) print $0 }' blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join | \
+sort -k1,1 | uniq > blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.overlap
+
+## Join tables to have full indel info (esp. the blockSizes and tStarts from blat psl) for the ilocus that has both pTALEN and indel
+# header of blat.${DB_PTALEN}.${QUERYNAME}.Reps.psl.awk
+# match(#1), mis-match(#2), rep_match(#3), nCount(#4), Q_gap_count(#5), Q_gap_bases(#6), T_gap_count(#7), T_gap_bases(#8), strand(#9), \
+# Q_name(#10), Q_size(#11), Q_start(#12), Q_end(#13), T_name(#14), T_size(#15), T_start(#16), T_end(#17), \
+# block_count(#18), blockSizes(#19), qStarts(#20), tStarts(#21).
+# header of blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.overlap
+# ilocus_id, ilocus_start, ilocus_end, TALEN1_start, TALEN2_start, Spacer_Length, TAL_1_Target, TAL_2_Target, TAL_1, TAL_2, TAL_1_Score, TAL_2_Scor\
+e, pTALEN
+
+
+join -1 14 -2 1 ${blat_gap_DIR}/blat.${DB_PTALEN}.${QUERYNAME}.Reps.psl.awk blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.overlap \
+> blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join
+echo "T_name match mis-match rep_match nCount Q_gap_count Q_gap_bases T_gap_count T_gap_bases strand \
+Q_name Q_size Q_start Q_end T_size T_start T_end block_count blockSizes qStarts tStarts \
+ilocus_start ilocus_end TALEN1_start TALEN2_start Spacer_Length TAL_1_Target TAL_2_Target TAL_1 TAL_2 TAL_1_Score TAL_2_Score pTALEN" | \
+cat - blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join | \
+awk '{ print $11,$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33 }' | \
+uniq > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1
+
+(head -n 1 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 && tail -n+2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 | sort -k 2,2) \
+> tmp && \mv tmp blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1
+
+head -1 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.2
+tail -n +2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.3
+
+done
+
+
+##-----
+#7. Narrow down the #6 iLoci hits whose pTALEN (#3) is within the defined distance (100 bp) from the indel region (#5).
+#
+#  Narrowing down the #6 iLocus hits is based on the block_count, blockSizes, tStarts, TALEN1_start and TALEN2_start \
+#  of the joint psl table such that the pTALEN (#3) is within 100 bp (or defined by the variable ${PTALEN_INDEL}) from the indel region of (#5).
+#  In Blat psl, the alignment is described as connected blocks with the size of maximum gap between tiles that form block default to 2 bp (defined \
+by -maxGap=N). As a result, the gap between blocks (larger than the maxGap of 2 bp) could be used to look for the gap caused by the pTalen.
+# |---------------------------blk1------------------------------|  |--------blk2--------| |-----blk3----|
+# Good candidate                                  |--ptalen1--|      |--ptalen2--|
+# Bad candidate      |--ptalen1--|      |--ptalen2--|
+#
+mkdir -p ${blat_gap_ptalen_DIR}
+cd ${blat_gap_ptalen_DIR}
+for i in ${SAMPLE}
+do
+QUERY=${i}-${SEQ}
+QUERYNAME=${i}.${SEQNAME}
+# make a table with these info:
+# Q_name T_name Q_gap_count Q_gap_bases T_gap_count T_gap_bases block_count blockSizes tStarts TALEN1_start TALEN2_start
+awk '{ print $1,$2,$7,$8,$9,$10,$18,$19,$21,$22,$23 }' blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.\
+1.s
+head -1 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.s > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.sh
+tail -n +2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.s > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.st
+
+len=`awk 'END { print NR }' blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.st`
+\rm blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.overlap
+for ((k=1; k<=$len; k++))
+do
+head -$k blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.st | tail -1 > rec
+cut -d " " -f1 rec > rec.Qname
+cut -d " " -f2 rec > rec.Tname
+cut -d " " -f4 rec > rec.QgapBases
+cut -d " " -f6 rec > rec.TgapBases
+cut -d " " -f7 rec > rec.blockCount
+cut -d " " -f8 rec > rec.blockSizes
+cut -d " " -f9 rec > rec.tStarts
+cut -d " " -f10 rec > rec.talen1Start
+cut -d " " -f11 rec > rec.talen2Start
+
+blockCount=`cat rec.blockCount`
+\rm rec.overlap
+for ((m=1; m<$blockCount; m++))
+do
+Qname=`cat rec.Qname`
+Tname=`cat rec.Tname`
+QgapBases=`cat rec.QgapBases`
+TgapBases=`cat rec.TgapBases`
+tStart=`cut -d"," -f $m rec.tStarts`
+tSize=`cut -d"," -f $m rec.blockSizes`
+tEnd=`expr $tStart + $tSize`
+next=`expr $m + 1`
+tStartNext=`cut -d"," -f $next rec.tStarts`
+tSizeNext=`cut -d"," -f $next rec.blockSizes`
+tEndNext=`expr $tStartNext + $tSizeNext`
+gapSize=`expr $tStartNext - $tEnd`
+pTalen1=`cat rec.talen1Start`
+pTalen2=`cat rec.talen2Start`
+echo "$Qname $Tname $QgapBases $TgapBases $blockCount $tStart $tEnd $tStartNext $tEndNext $gapSize $pTalen1 $pTalen2" >> rec.overlap
+done
+
+
+awk -v Plen=${PTALEN_LEN} -v Pdel=${PTALEN_INDEL} '{ OFS="\t"; if ($11<$7 && ($7-$11)<(Plen+Pdel)) print $0 ; \
+else if ($11>=$7 && $11<$8) print $0; else if ($11>=$8 && ($11-$8)<Pdel) print $0 }' rec.overlap >> blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.ove\
+rlap
+
+done
+
+join -1 2 -2 2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.3 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.overlap \
+> blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap
+
+#Join to have the gene name for the iLocus
+join -1 1 -2 2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap ${ilocus_DIR}/${ILOCUSNAME}.genemap \
+> tmp && \mv tmp blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap
+
+echo "T_name Q_name match mis-match rep_match nCount Q_gap_count Q_gap_bases T_gap_count T_gap_bases strand Q_size Q_start Q_end T_size T_start T_e\
+nd block_count blockSizes qStarts tStarts TALEN1_start TALEN2_start Spacer_Length TAL_1_Target TAL_2_Target TAL_1 TAL_2 TAL_1_Score TAL_2_Score pTA\
+LEN Qname QgapBases TgapBases blockCount tStart tEnd tStartNext tEndNext gapSize pTalen1 pTalen2 T_GeneName" | cat - blat.${DB_PTALEN}.${QUERYNAME}\
+.psl.awk.join.1.overlap > tmp &&\
+\mv tmp blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap
+
+
+# Rearrange columns original
+# 1 T_name 2 Q_name 3 match 4 mis-match 5 rep_match 6 nCount 7 Q_gap_count 8 Q_gap_bases 9 T_gap_count 10 T_gap_bases 11 strand
+# 12 Q_size 13 Q_start 14 Q_end 15 T_size 16 T_start 17 T_end 18 block_count 19 blockSizes 20 qStarts 21 tStarts
+# 22 TALEN1_start 23 TALEN2_start 24 Spacer_Length 25 TAL_1_Target 26 TAL_2_Target 27 TAL_1 28 TAL_2 29 TAL_1_Score 30 TAL_2_Score 31 pTALEN
+# 32 Q_name 33 QgapBases 34 TgapBases 35 blockCount 36 tStart 37 tEnd 38 tStartNext 39 tEndNext 40 gapSize 41 pTalen1 42 pTalen2 43 T_GeneName
+
+# Rearrange columns to:
+# 2 Q_name 1 T_name 43 T_GeneName 8 Q_gap_bases 10 T_gap_bases 12 Q_size 13 Q_start 14 Q_end 15 T_size 16 T_start 17 T_end
+# 18 block_count 19 blockSizes 20 qStarts 21 tStarts
+# 36 tStart 37 tEnd 40 gapSize 38 tStartNext 39 tEndNext
+# 22 TALEN1_start 23 TALEN2_start 24 Spacer_Length 25 TAL_1_Target 26 TAL_2_Target
+# 27 TAL_1 28 TAL_2 29 TAL_1_Score 30 TAL_2_Score 31 pTALEN
+
+awk '{ print $2,$1,$43,$8,$10,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$36,$37,$40,$38,$39,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31 }' blat.${DB_PTAL\
+EN}.${QUERYNAME}.psl.awk.join.1.overlap > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.1
+head -1 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.2
+tail -n+2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.3
+done
+
+
+#-----
+#8. Extract the blat alignemnts (#4) according to the #7 iLoci hits for final inspection.
+#
+# Note that a ilocus that contains indel at a low complexity region may not be considered a good candidate.
+#
+mkdir -p ${blat_gap_ptalen_overlap_DIR}
+cd ${blat_gap_ptalen_overlap_DIR}
+for i in ${SAMPLE}
+do
+QUERY=${i}-${SEQ}
+QUERYNAME=${i}.${SEQNAME}
+\rm ${DB_PTALEN}.${QUERYNAME}.alignment.report
+\cp ${blat_gap_ptalen_DIR}/blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.1 ${DB_PTALEN}.${QUERYNAME}.indel.overlap
+\cp ${blat_gap_ptalen_DIR}/blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.3 ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader
+
+len=`awk 'END { print NR }' ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader`
+
+for ((k=1; k<=$len; k++))
+do
+query=`head -$k ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader | tail -1 | cut -d " " -f 1`
+ilocus=`head -$k ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader | tail -1 | cut -d " " -f 2`
+blastdbcmd -db ${prereq_DIR}/DB_${i}_contig -entry "lcl|${query}" -dbtype nucl -outfmt "%f" -out ${i}-${query}.fa
+sed -i -e "s/>lcl|/>/" ${i}-${query}.fa
+blastdbcmd -db ${ptalen_DIR}/${DB_PTALEN} -entry ${ilocus} -dbtype nucl -outfmt "%f" -out ${ilocus}.fa
+sed -i -e "s/>lcl|/>/" ${ilocus}.fa
+
+blat -t=dna -q=dna -out=psl -minIdentity=${PERC_IDENTITY} -minScore=${MIN_SCORE} ${ilocus}.fa ${i}-${query}.fa \
+blat.${i}-${query}-on-${ilocus}.psl
+blat -t=dna -q=dna -out=blast -minIdentity=${PERC_IDENTITY} -minScore=${MIN_SCORE} ${ilocus}.fa ${i}-${query}.fa \
+blat.${i}-${query}-on-${ilocus}.blast
+pslPretty blat.${i}-${query}-on-${ilocus}.psl ${ilocus}.fa ${i}-${query}.fa blat.${i}-${query}-on-${ilocus}.psl.pretty
+pslPretty -long blat.${i}-${query}-on-${ilocus}.psl ${ilocus}.fa ${i}-${query}.fa blat.${i}-${query}-on-${ilocus}.psl.pretty.long
+
+done
+done
+
+more *${SEQNAME}.indel.overlap > ${DB_PTALEN}.${SEQNAME}.AllSample.indel.overlap
+echo "
+# The iloci from samples that contain overlapping indel and pTALEN
+" | cat - ${DB_PTALEN}.${SEQNAME}.AllSample.indel.overlap > tmp && \mv tmp ${DB_PTALEN}.${SEQNAME}.AllSample.indel.overlap
+
+
+#-----
+#9. Manually inspect the iloci from samples for containing overlapping paired-TALEN and indel.
+#---
+# THIS SECTION REQUIRES MANUAL INSPECTION
+# Cases whose indels are likely resulted from low complexicity reading/sequencing error, or whose \
+# indels are too far away and not overlapping with the paired-talen are dropped out in this step.
+#---
+#
+cd ${blat_gap_ptalen_overlap_DIR}
+mkdir -p ${blat_gap_ptalen_overlap_inspected_DIR}
+\cp -r ${DB_PTALEN}.*.contig.indel.overlap ${blat_gap_ptalen_overlap_inspected_DIR}
+\cp -r blat.*.psl.pretty.long ${blat_gap_ptalen_overlap_inspected_DIR}
+# Use ${DB_PTALEN}.${QUERYNAME}.indel.overlap as a guide to identify and annotate\
+# (with xxxxx marks) the paired-TALEN EBE on the \
+# blat.${i}-${query}-on-${ilocus}.psl.pretty.long. Renname the file to -YES for positive, \
+# -NO for negative, and -ND for not able to determine.
+# Update ${DB_PTALEN}.${QUERYNAME}.indel.overlap to include only the positives
+# generate ${DB_PTALEN}.${QUERYNAME}.indel.overlap with no header
+cd ${blat_gap_ptalen_overlap_inspected_DIR}
+mkdir -p NO/
+\mv blat.*.psl.pretty.long-N* NO/
+
+for i in ${SAMPLE}
+do
+QUERY=${i}-${SEQ}
+QUERYNAME=${i}.${SEQNAME}
+tail -n+2 ${DB_PTALEN}.${QUERYNAME}.indel.overlap > ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader
+\rm ${DB_PTALEN}.${QUERYNAME}.alignment.report
+len=`awk 'END { print NR }' ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader`
+for ((k=1; k<=$len; k++))
+do
+query=`head -$k ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader | tail -1 | cut -d " " -f 1`
+ilocus=`head -$k ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader | tail -1 | cut -d " " -f 2`
+echo "
+##-------------------------------------------------
+##Report for blat alignment of ${i} query ${query} against target ${ilocus}
+# The paired TALEN EBE sites are marked with "xxxxx"
+# Only alignment region of surrounding 10 lines from the pTALEN site is shown here for quick survey purpose.
+# See original file blat.${i}-${query}-on-${ilocus}.psl.pretty.long-YES for full record.
+#
+" >> ${DB_PTALEN}.${QUERYNAME}.alignment.report
+head -1 blat.${i}-${query}-on-${ilocus}.psl.pretty.long-YES >> ${DB_PTALEN}.${QUERYNAME}.alignment.report
+echo "
+#-----Gap Region-----
+" >> ${DB_PTALEN}.${QUERYNAME}.alignment.report
+cat blat.${i}-${query}-on-${ilocus}.psl.pretty.long-YES | grep -B 10 -A 10 -E "xx" >> ${DB_PTALEN}.${QUERYNAME}.alignment.report
+
+done
+done
+
+more *.${SEQNAME}*.alignment.report > ${DB_PTALEN}.${SEQNAME}.ALLSample.alignment.report
+more *${SEQNAME}.indel.overlap > ${DB_PTALEN}.${SEQNAME}.AllSample.indel.overlap
+echo "
+# The iloci from samples that contain overlapping indel and pTALEN
+" | cat - ${DB_PTALEN}.${SEQNAME}.AllSample.indel.overlap > tmp && \mv tmp ${DB_PTALEN}.${SEQNAME}.AllSample.indel.overlap
+
+echo "
+##-------------------------------------------------
+## The alignemnts of filtered blat hits for query sequences against reference that contain one or more indels
+# with total indel gap length larger than 4 bp, and also contain the overlapping talesfpaired predicted pTalen EBE (pTalen)
+# Original file at:
+${blat_gap_ptalen_overlap_DIR}/${DB_PTALEN}.${SEQNAME}.ALLSample.alignment.report
+" >> ${report_DIR}/${REPORT}
+
+cat ${DB_PTALEN}.${SEQNAME}.ALLSample.alignment.report >> ${report_DIR}/${REPORT}
+
+#-----
+#10. Report
+#
+mkdir -p ${report_DIR}
+cd ${report_DIR}
+
+mkdir -p ${report_DIR}/off_targets
+\cp ${blat_gap_ptalen_overlap_inspected_DIR}/${DB_PTALEN}.${SEQNAME}.AllSample.indel.overlap .
+\cp -r ${blat_gap_ptalen_overlap_inspected_DIR}/blat.*-YES ${report_DIR}/off_targets
+
+mkdir -p ${report_DIR}/all_targets
+\cp ${suppl_DIR}/0README-suppl .
+\cp -r ${suppl_DIR}/gap/catalog/list/iloci.table.h* ${report_DIR}/all_targets
+\cp -r ${suppl_DIR}/gap/catalog/list/iloci.table.H* ${report_DIR}/all_targets
+
+mkdir -p ${report_DIR}/all_targets/YB12345678
+\cp -r ${suppl_DIR}/gap/catalog/blat/YB12345678/blat.*.pretty.short ${report_DIR}/all_targets/YB12345678
+
+mkdir -p ${report_DIR}/all_targets/YB1v2345678
+\cp -r ${suppl_DIR}/gap/catalog/blat/YB1v2345678/blat.*.pretty.short ${report_DIR}/all_targets/YB1v2345678
+
+
+#-----
+#DONE
+#-----
+
