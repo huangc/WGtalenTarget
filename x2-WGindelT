@@ -194,13 +194,12 @@ done
 # locus12345 1114 0 1357246 2476 500 YB1;YB2;YB4;YB5;YB6;YB8;
 # Note "q" (query) is for insertion, and "t" (target) is for deletion.
 
-\rm -r *.sample
 for indel in q t
 do
 cd ${run_DIR}
 mkdir -p ${indel}
 cd ${indel}
-
+\rm -r *.sample
 for i in ${SAMPLE}
 do
 QUERY=${i}-${SEQ}
