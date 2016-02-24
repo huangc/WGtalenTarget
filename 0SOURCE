@@ -59,7 +59,8 @@ GAP_MINNUM=0 #Minimal number of gaps, more than and not including this number.
 GAP_MINSIZE=100 #Minimal size of total gaps, more than and not including this number.
 
 ## qsub parameters for x1-WGblat job running on Mason 
-# The run time for whole genome blat of a typical 3kRGP rice cultivar contigs against reference rice Japonica takes about 90-100 hrs on Mason. Plan carefully for submitting the job. 
+# The run time for whole genome blat of a typical 3kRGP rice cultivar contigs against reference rice Japonica
+# takes about 90-100 hrs on Mason. Plan carefully for submitting the job. 
 # WALLTIME=120
 WALLTIME=24
 PPN=16
