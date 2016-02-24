@@ -77,24 +77,23 @@ sh pairedtalesf.sh
 # makeblastdb -in ${ILOCUSSEQ_PTALEN} -dbtype nucl -out ${DB_PTALEN} -parse_seqids
 
 ##-----
-#2. Generate the join table that contain the associated pTALEN and indels, 
-# which has their distance within ${PTALEN_INDEL} bp.
-# use awk to extract the following: ilocus_id, start, end
-#blat.${DB_PTALEN}.${QUERYNAME}.Reps.psl.awk at fields $14, $16, $17
-
-# pairedtalesf.${PTALEN}-on-${ILOCUSNAME} at field $1, ${{PATLEN}, $2, $3, $4, $5, $6, $7, $8, $9, $10
-#Sequence_Name ${PTALEN} TAL_1 TAL_2 TAL_1_Score TAL_2_Score TAL_1_Start TAL_2_Start Spacer_Length TAL_1_Target TAL_2_Target
-# add the ${PTALEN} to the above
+#2. Generate the join table that contain the "associated" pTALEN and indels, 
+# which are defined as having their distance within ${PTALEN_INDEL} bp.
+# Use awk to extract the following fields from deletion table: Tname(#1), tGapStart(#2), tGapSize(#3)
+# and ptalen table pairedtalesf.${PTALEN}-on-${REFSEQNAME} at fields:
+# Sequence_Name(#1)  ${PTALEN} TAL_1(#2) TAL_2(#3) TAL_1_Score(#4) TAL_2_Score(#5) 
+# TAL_1_Start(#6) TAL_2_Start(#7) Spacer_Length(#8) TAL_1_Target(#9) TAL_2_Target(#10).
+# ${PTALEN} is added to the above for clarity.
 # change the TAL_Target such that "T TCCTGAAGAATTGATTCACTTC" becomes "TTCCTGAAGAATTGATTCACTTC"
-mkdir -p ${blat_gap_ptalen_DIR}
-cd ${blat_gap_ptalen_DIR}
-\rm pairedtalesf.pTALEN-on-${ILOCUSNAME}.irange
+
+cd ${run_DIR}/ptalen
+\rm pairedtalesf.pTALEN-on-${REFSEQNAME}.txt.1
 for p in ${PTALEN}
 do
-sed -r 's/\bT\s/T/g' ${ptalen_DIR}/pairedtalesf.${p}-on-${ILOCUSNAME}.txt | awk -v Rvd=${p} '{ FS="\t"; OFS="\t"; print $1,$6,$7,$8,$9,$10,$2,$3,$4\
-,$5,Rvd }' | tail -n+4 >> pairedtalesf.pTALEN-on-${ILOCUSNAME}.irange
+sed -r 's/\bT\s/T/g' pairedtalesf.${p}-on-${REFSEQNAME}.txt | \
+awk -v Rvd=${p} '{ FS="\t"; OFS="\t"; print $1,$6,$7,$8,$9,$10,$2,$3,$4,$5,Rvd }' | \
+tail -n+4 >> pairedtalesf.pTALEN-on-${REFSEQNAME}.txt.1
 done
-sort -k 1,1 pairedtalesf.pTALEN-on-${ILOCUSNAME}.irange > pairedtalesf.pTALEN.irange
 
 
 for i in ${SAMPLE}
@@ -110,8 +109,10 @@ join -1 1 -2 1 blat.${DB_PTALEN}.${QUERYNAME}.irange pairedtalesf.pTALEN.irange 
 # arrange the column such that ilocus_start < ilocus_end, and TALEN1_start < TALEN2_start.
 awk '{ OFS="\t"; if ($2>$3) print $1,$3,$2,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13; else print $0 }' blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join |\
 awk '{ OFS="\t"; if ($4>$5) print $1,$2,$3,$5,$4,$6,$7,$8,$9,$10,$11,$12,$13; else print $0 }' > blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.tmp && \
-\
 \mv blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.tmp blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join
+
+
+
 
 ## use awk to find ilocus that overlap (within the ranges of 100 bp; note that the range of talesfpaired is small, normally within 60 bp.
 awk -v Plen=${PTALEN_LEN} -v Pdel=${PTALEN_INDEL} '{ OFS="\t"; if ($4<$2 && ($2-$4)<(Plen+Pdel)) print $0 ; \
