@@ -36,23 +36,22 @@ cd ${run_DIR}
 mkdir -p ptalen
 cd ptalen
 \rm pairedtalesf.sh
-cp -s ${prereq_DIR}/pTALEN* .
 for p in ${PTALEN}
 do
+cp -s ${prereq_DIR}/${p} .
 echo "
 #!/usr/bin/bash
-${PTALEN_DIR}/pairedtalesf \
+pairedtalesf \
         -m ${TPO_m} \
         -x ${TPO_x} \
         -n ${TPO_n} \
         -t ${TPO_t} \
-        -o pairedtalesf.${p}-on-${ILOCUSNAME} \
-        ${ilocus_DIR}/${ILOCUSSEQ} \
+        -o pairedtalesf.${p}-on-${REFSEQNAME} \
+        ${prereq_DIR}/${REFSEQ} \
         "`cat ${p}`"
 " >> pairedtalesf.sh
 done
 sh pairedtalesf.sh
-
 
 #-----
 #3. Extract sequences of iLoci that contain paired TALENs (pTALEN).
