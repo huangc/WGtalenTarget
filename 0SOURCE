@@ -2,6 +2,15 @@
 EMAIL=youremail@indiana.edu
 WORK_DIR=/your_home/your_workdir
 
+## Sub-directory for workflow
+prereq_DIR=${WORK_DIR}/prereq
+doc_DIR=${WORK_DIR}/doc
+bin_DIR=${WORK_DIR}/bin
+src_DIR=${WORK_DIR}/src
+data_DIR=${WORK_DIR}/data
+run_DIR=${WORK_DIR}/run
+scratch_DIR=${WORK_DIR}/scratch
+
 # REFSEQ is the fasta file for reference genome, retrieved by bin/xgetseq, and located in prereq/. 
 # REFSEQ=OsjCHR.fa
 REFSEQ=OsjChr10.fa
@@ -20,22 +29,6 @@ denovo_DIR=/N/dc2/projects/brendelgroup/TRegGA/TRegGA_v1/assembly/denovo
 # the contig files should be stored and named as ${denovo_DIR}/${SAMPLE}/${SAMPLE}-SOAP/${SAMPLE}-soap.contig
 SEQ="soap.contig"
 SEQNAME="contig"
-
-## qsub parameters for x1-WGblat job running on Mason 
-# The run time for whole genome blat of a typical 3kRGP rice cultivar contigs against reference rice Japonica takes about 90-100 hrs on Mason. Plan carefully for submitting the job. 
-# WALLTIME=120
-WALLTIME=24
-PPN=16
-VMEM=40
-
-## Sub-directory for workflow
-prereq_DIR=${WORK_DIR}/prereq
-doc_DIR=${WORK_DIR}/doc
-bin_DIR=${WORK_DIR}/bin
-src_DIR=${WORK_DIR}/src
-data_DIR=${WORK_DIR}/data
-run_DIR=${WORK_DIR}/run
-scratch_DIR=${WORK_DIR}/scratch
 
 ## blastn
 # Add blast+ directory to the PATH
@@ -65,6 +58,13 @@ MIN_SCORE=250
 GAP_MINNUM=0 #Minimal number of gaps, more than and not including this number.
 GAP_MINSIZE=100 #Minimal size of total gaps, more than and not including this number.
 
+## qsub parameters for x1-WGblat job running on Mason 
+# The run time for whole genome blat of a typical 3kRGP rice cultivar contigs against reference rice Japonica takes about 90-100 hrs on Mason. Plan carefully for submitting the job. 
+# WALLTIME=120
+WALLTIME=24
+PPN=16
+VMEM=40
+
 ## TALE-NT2 target finder
 export PATH=$PATH:${src_DIR}/tale_nt2/talesf-paired
 # PTALEN is a list of paired TALEN RVD sequences
@@ -83,8 +83,20 @@ TPO_m=15
 TPO_x=30
 TPO_n=4
 TPO_t=3
-# PTALEN_LEN and PTALEN_INDEL are parameters to define the overlapping range between ptalen site and deletin site.
-PTALEN_LEN=60 #the average size (bp) of paired TALEN binding site from edge to edge and including the spacer.
-PTALEN_INDEL=100 #the distance (bp) from the near edge of pTALEN to the near edge of indel. This is used to define how close \
-# the pTALEN is to the indel to be called "overlapping".
+
+##  pTALEN and deletion sites i defined such that the pTALEN (#3) is within 100 bp (or defined by the variable ${PTALEN_INDEL}) fro\
+m the indel region of (#5).
+#  In Blat psl, the alignment is described as connected blocks with the size of maximum gap between tiles that form b\
+lock default to 2 bp (defined by -maxGap=N). As a result, the gap between blocks (larger than the maxGap of 2 bp) cou\
+ld be used to look for the gap caused by the pTalen.
+# |---------------------------blk1------------------------------|  |--------blk2--------| |-----blk3----|
+# Good candidate                                  |--ptalen1--|      |--ptalen2--|
+# Bad candidate      |--ptalen1--|      |--ptalen2--|
+
+## PTALEN_LEN and PTALEN_INDEL are parameters to define the overlapping range between ptalen site and deletion site.
+# the average size (bp) of paired TALEN binding site from edge to edge and including the spacer.
+PTALEN_LEN=60 
+# the distance (bp) from the near edge of pTALEN to the near edge of indel. 
+# This is used to define how close the pTALEN is to the indel to be called "overlapping".
+PTALEN_INDEL=100 
 
