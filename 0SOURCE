@@ -68,6 +68,7 @@ VMEM=40
 ## TALE-NT2 target finder
 # Add target finder to the PATH
 export PATH=$PATH:${src_DIR}/tale_nt2/talesf-paired
+#  Usage: pairedtalesf [options] sequence_file_path "rvdseq1" "rvdseq2"
 #  Options:
 #    -c|--cupstream        sets the allowed upstream bases; 0 for T only, 1 for C only, 2 for either
 #    -d|--dimer            sets types of dimer targets to search for; 0 for both homo and heterodimers, 
