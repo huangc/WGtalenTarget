@@ -40,7 +40,7 @@ cd ptalen
 \rm pairedtalesf.sh
 for p in ${PTALEN}
 do
-cp -s ${prereq_DIR}/${p} .
+\cp -r ${prereq_DIR}/${p} .
 echo "
 #!/usr/bin/bash
 pairedtalesf \
@@ -77,31 +77,34 @@ done
 cd ${run_DIR}/ptalen
 ln -s ${data_DIR}/Seq.t_Lg${GAP_MINSIZE}.table .
 
-\rm Seq.t_pTALENs-on-${REFSEQNAME}.assoct
+\rm Seq.t_pTALENs-on-${REFSEQNAME}.out
+\rm Seq.t_pTALENs-on-${REFSEQNAME}.err
 len=`awk 'END { print NR }' Seq.t_Lg${GAP_MINSIZE}.table`
 # Note that the first row is the header "Tname tGapStart tGapSize Samples"
 for ((k=2; k<=$len; k++))
 do
 head -$k Seq.t_Lg${GAP_MINSIZE}.table | tail -1 > Trec
-cut -d " " -f1 rec > Trec.Tname
-cut -d " " -f2 rec > Trec.tGapStart
-cut -d " " -f3 rec > Trec.tGapSize
-cut -d " " -f4 rec > Trec.Samples
+cut -d " " -f1 Trec > Trec.Tname
+cut -d " " -f2 Trec > Trec.tGapStart
+cut -d " " -f3 Trec > Trec.tGapSize
+cut -d " " -f4 Trec > Trec.Samples
 
 # This is to loop over the ptalen table for associated pTALEN site
 row=`awk 'END { print NR }' pairedtalesf.pTALENs-on-${REFSEQNAME}.txt`
-for ((m=1; m<=$row; m++))
+for ((m=4; m<=$row; m++))
 do
-cut -d "\t" -f1 Prec.SeqName
-cut -d "\t" -f2 Prec.TAL_1_Start
-cut -d "\t" -f3 Prec.TAL_2_Start
-cut -d "\t" -f4 Prec.TAL_1_Target
-cut -d "\t" -f5 Prec.TAL_2_Target
-cut -d "\t" -f6 Prec.TAL_1
-cut -d "\t" -f7 Prec.TAL_2
-cut -d "\t" -f8 Prec.TAL_1_Score
-cut -d "\t" -f9 Prec.TAL_2_Score
-cut -d "\t" -f10 Prec.PTALEN
+head -$m pairedtalesf.pTALENs-on-${REFSEQNAME}.txt | tail -1 > Prec
+cut -f1 Prec > Prec.SeqName
+cut -f2 Prec > Prec.TAL_1_Start
+cut -f3 Prec > Prec.TAL_2_Start
+cut -f4 Prec > Prec.Spacer_Length
+cut -f5 Prec > Prec.TAL_1_Target
+cut -f6 Prec > Prec.TAL_2_Target
+cut -f7 Prec > Prec.TAL_1
+cut -f8 Prec > Prec.TAL_2
+cut -f9 Prec > Prec.TAL_1_Score
+cut -f10 Prec > Prec.TAL_2_Score
+cut -f11 Prec > Prec.PTALEN
 
 Tname=`cat Trec.Tname`
 tGapStart=`cat Trec.tGapStart`
@@ -111,6 +114,7 @@ tGapEnd=`expr $tGapStart + $tGapSize`
 Pname=`cat Prec.SeqName`
 pTAL1Start=`cat Prec.TAL_1_Start`
 pTAL2Start=`cat Prec.TAL_2_Start`
+pSpacerLen=`cat Prec.Spacer_Length`
 pTAL1Target=`cat Prec.TAL_1_Target`
 pTAL2Target=`cat Prec.TAL_2_Target`
 pTAL1Rvd=`cat Prec.TAL_1`
@@ -119,28 +123,27 @@ pTAL1Score=`cat Prec.TAL_1_Score`
 pTAL2Score=`cat Prec.TAL_2_Score`
 pTALEN=`cat Prec.PTALEN`
 
-if [ ${Tname} == ${Pname} ]; then
-    if [ ${pTAL1Start} < ${tGapStart} \& `exp ${tGapStart} - ${pTAL1Start}` < `exp ${PLEN} + ${PDEL}` ]; then
-	echo "${Tname} ${tGapStart} ${tGapEnd} ${tGapSize} ${pTAL1Start} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
-${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.assoct
-    elif [ ${pTAL1Start} >= ${tGapStart} \& ${pTAL1Start} < ${tGapEnd} ]; then
-	echo "${Tname} ${tGapStart} ${tGapEnd} ${tGapSize} ${pTAL1Start} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
-${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.assoct
-    elif [ ${pTAL1Start} > ${tGapEnd} \& `exp  ${pTAL1Start} - ${tGapEnd}` < ${PDEL} ]; then
-	echo "${Tname} ${tGapStart} ${tGapEnd} ${tGapSize} ${pTAL1Start} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
-${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.assoct
+if [[ ${Tname} = ${Pname} ]]; then
+    if (( ${pTAL1Start} < ${tGapStart} && `expr ${tGapStart} - ${pTAL1Start}` < `expr ${PLEN} + ${PDEL}` )); then
+	echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+ ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
+    elif (( ${pTAL1Start} >= ${tGapStart} && ${pTAL1Start} < ${tGapEnd} )); then
+	echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+ ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
+    elif (( ${pTAL1Start} > ${tGapEnd} && `expr  ${pTAL1Start} - ${tGapEnd}` < ${PDEL} )); then
+	echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+ ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
+    else
+	echo "${Tname}-${tGapStart}-${tGapEnd} is not paired-TALEN target for ${Pname}-${pTAL1Start}-${pTAL2Start}" \
+>> Seq.t_pTALENs-on-${REFSEQNAME}.err
     fi
 fi
 
-
-
-
-
-awk -v Plen=${PTALEN_LEN} -v Pdel=${PTALEN_INDEL} '{ OFS="\t"; if ($pTalen1<$GapStart && ($GapStart-$pTalen1)<(Plen+Pdel)) print $0 ; \
-else if ($pTalen1>=$GapStart && $pTalen1<$GapEnd) print $0; else if ($pTalen1>=$GapEnd && ($pTalen1-$GapEnd)<Pdel) print $0 }' rec.overlap >> blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.overlap
-
-
 done
+done
+
+echo "Tname tGapStart tGapSize tGapEnd pTAL1Start pSpacerLen pTAL2Start pTAL1Target pTAL2Target \
+pTAL1Rvd pTAL2Rvd pTAL1Score pTAL2Score pTALEN" | cat - Seq.t_pTALENs-on-${REFSEQNAME}.out > Seq.t_pTALENs-on-${REFSEQNAME}.OUT
 
 
 #-----
