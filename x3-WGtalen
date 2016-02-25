@@ -27,9 +27,9 @@ source ./0SOURCE
 cd ${run_DIR}
 
 #0. Prerequisite files
-# Deletion summary table: data/Seq.t_Lg${GAP_MINSIZE}.table, generated from x2-WGindelT with the content:
+# Deletion summary table: ${data_DIR}/Seq.t_Lg${GAP_MINSIZE}.table, generated from x2-WGindelT with the content:
 # "Tname tGapStart tGapSize Samples" 
-# TALEN RVD sequences: prereq/pTALEN_*, generated from PREREQ.sh with the content: 
+# TALEN RVD sequences: ${prereq_DIR}/pTALEN_*, generated from PREREQ.sh with the content: 
 # '"rvdseq1" "rvdseq2"'
 
 #-----
@@ -55,196 +55,91 @@ pairedtalesf \
 done
 sh pairedtalesf.sh
 
-#-----
-#2. Extract sequences of iLoci that contain paired TALENs (pTALEN).
-#
-# mkdir -p ${ptalen_DIR}
-# cd ${ptalen_DIR}
-# get the locus list that contains pTALEN
-# \rm pTALEN.locus
-# for p in ${PTALEN}
-# do
-# tail -n +4 ${ptalen_DIR}/pairedtalesf.${p}-on-${ILOCUSNAME}.txt | awk '{ print $1 }' >> pTALEN.locus
-# done
-
-# Sort by first column starting on 6th character (-k1.6) and then sort numerically (-n).
-# sort -k1.6 -n pTALEN.locus | uniq > pTALEN.locus.sorted
-
-# Extract sequence from OsjLOCUS database using "-entry_batch": Input file for batch processing, entries must be provided one per line.
-# blastdbcmd -db ${ilocus_DIR}/${DB_ILOCUS} -entry_batch pTALEN.locus.sorted -outfmt "%f" > ${ILOCUSSEQ_PTALEN}
-# Format the sequences for easier use in subsequent programs:
-# sed -i -e "s/>lcl|/>/" ${ILOCUSSEQ_PTALEN}
-# makeblastdb -in ${ILOCUSSEQ_PTALEN} -dbtype nucl -out ${DB_PTALEN} -parse_seqids
-
 ##-----
-#2. Generate the join table that contain the "associated" pTALEN and indels, 
-# which are defined as having their distance within ${PTALEN_INDEL} bp.
-# Use awk to extract the following fields from deletion table: Tname(#1), tGapStart(#2), tGapSize(#3)
-# and ptalen table pairedtalesf.${PTALEN}-on-${REFSEQNAME} at fields:
+#2. Rearrange columns of pTalen table and add ${PTALEN} for clarity.
 # Sequence_Name(#1)  ${PTALEN} TAL_1(#2) TAL_2(#3) TAL_1_Score(#4) TAL_2_Score(#5) 
 # TAL_1_Start(#6) TAL_2_Start(#7) Spacer_Length(#8) TAL_1_Target(#9) TAL_2_Target(#10).
-# ${PTALEN} is added to the above for clarity.
-# change the TAL_Target such that "T TCCTGAAGAATTGATTCACTTC" becomes "TTCCTGAAGAATTGATTCACTTC"
+# Change the TAL_Target such that "T TCCTGAAGAATTGATTCACTTC" becomes "TTCCTGAAGAATTGATTCACTTC"
 
 cd ${run_DIR}/ptalen
-\rm pairedtalesf.pTALEN-on-${REFSEQNAME}.txt.1
+\rm pairedtalesf.pTALENs-on-${REFSEQNAME}.txt
 for p in ${PTALEN}
 do
 sed -r 's/\bT\s/T/g' pairedtalesf.${p}-on-${REFSEQNAME}.txt | \
 awk -v Rvd=${p} '{ FS="\t"; OFS="\t"; print $1,$6,$7,$8,$9,$10,$2,$3,$4,$5,Rvd }' | \
-tail -n+4 >> pairedtalesf.pTALEN-on-${REFSEQNAME}.txt.1
+tail -n+4 >> pairedtalesf.pTALENs-on-${REFSEQNAME}.txt
 done
 
-
-for i in ${SAMPLE}
-do
-QUERY=${i}-${SEQ}
-QUERYNAME=${i}.${SEQNAME}
-# use awk to extract the following: ilocus_id, start, end
-awk '{ FS="\t"; OFS="\t"; print $14,$16,$17 }' ${blat_gap_DIR}/blat.${DB_PTALEN}.${QUERYNAME}.Reps.psl.awk | sort -k 1,1 > blat.${DB_PTALEN}.${QUER\
-YNAME}.irange
-# join based on the ilocus_id to have ilocus_id, ilocus_start, ilocus_end, TALEN1_start, TALEN2_start, Spacer_Length, TAL_1_Target, TAL_2_Target, T\
-AL_1, TAL_2, TAL_1_Score, TAL_2_Score, pTALEN
-join -1 1 -2 1 blat.${DB_PTALEN}.${QUERYNAME}.irange pairedtalesf.pTALEN.irange > blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join
-# arrange the column such that ilocus_start < ilocus_end, and TALEN1_start < TALEN2_start.
-awk '{ OFS="\t"; if ($2>$3) print $1,$3,$2,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13; else print $0 }' blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join |\
-awk '{ OFS="\t"; if ($4>$5) print $1,$2,$3,$5,$4,$6,$7,$8,$9,$10,$11,$12,$13; else print $0 }' > blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.tmp && \
-\mv blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.tmp blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join
-
-
-
-
-## use awk to find ilocus that overlap (within the ranges of 100 bp; note that the range of talesfpaired is small, normally within 60 bp.
-awk -v Plen=${PTALEN_LEN} -v Pdel=${PTALEN_INDEL} '{ OFS="\t"; if ($4<$2 && ($2-$4)<(Plen+Pdel)) print $0 ; \
-else if ($4>=$2 && $4<$3) print $0; else if ($4>=$3 && ($4-$3)<Pdel) print $0 }' blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join | \
-sort -k1,1 | uniq > blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.overlap
-
-## Join tables to have full indel info (esp. the blockSizes and tStarts from blat psl) for the ilocus that has both pTALEN and indel
-# header of blat.${DB_PTALEN}.${QUERYNAME}.Reps.psl.awk
-# match(#1), mis-match(#2), rep_match(#3), nCount(#4), Q_gap_count(#5), Q_gap_bases(#6), T_gap_count(#7), T_gap_bases(#8), strand(#9), \
-# Q_name(#10), Q_size(#11), Q_start(#12), Q_end(#13), T_name(#14), T_size(#15), T_start(#16), T_end(#17), \
-# block_count(#18), blockSizes(#19), qStarts(#20), tStarts(#21).
-# header of blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.overlap
-# ilocus_id, ilocus_start, ilocus_end, TALEN1_start, TALEN2_start, Spacer_Length, TAL_1_Target, TAL_2_Target, TAL_1, TAL_2, TAL_1_Score, TAL_2_Scor\
-e, pTALEN
-
-
-join -1 14 -2 1 ${blat_gap_DIR}/blat.${DB_PTALEN}.${QUERYNAME}.Reps.psl.awk blat.${DB_PTALEN}.${QUERYNAME}.pTALEN.join.overlap \
-> blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join
-echo "T_name match mis-match rep_match nCount Q_gap_count Q_gap_bases T_gap_count T_gap_bases strand \
-Q_name Q_size Q_start Q_end T_size T_start T_end block_count blockSizes qStarts tStarts \
-ilocus_start ilocus_end TALEN1_start TALEN2_start Spacer_Length TAL_1_Target TAL_2_Target TAL_1 TAL_2 TAL_1_Score TAL_2_Score pTALEN" | \
-cat - blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join | \
-awk '{ print $11,$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33 }' | \
-uniq > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1
-
-(head -n 1 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 && tail -n+2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 | sort -k 2,2) \
-> tmp && \mv tmp blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1
-
-head -1 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.2
-tail -n +2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.3
-
-done
-
-
-##-----
-#7. Narrow down the #6 iLoci hits whose pTALEN (#3) is within the defined distance (100 bp) from the indel region (#5).
+#3. Generate the join table that contain the "associated" pTALEN and indels, 
+# which are defined as having their distance within ${PTALEN_INDEL} bp.
+# Join the tables by Tname(#1), tGapStart(#2), tGapSize(#3)
 #
-#  Narrowing down the #6 iLocus hits is based on the block_count, blockSizes, tStarts, TALEN1_start and TALEN2_start \
-#  of the joint psl table such that the pTALEN (#3) is within 100 bp (or defined by the variable ${PTALEN_INDEL}) from the indel region of (#5).
-#  In Blat psl, the alignment is described as connected blocks with the size of maximum gap between tiles that form block default to 2 bp (defined \
-by -maxGap=N). As a result, the gap between blocks (larger than the maxGap of 2 bp) could be used to look for the gap caused by the pTalen.
-# |---------------------------blk1------------------------------|  |--------blk2--------| |-----blk3----|
-# Good candidate                                  |--ptalen1--|      |--ptalen2--|
-# Bad candidate      |--ptalen1--|      |--ptalen2--|
-#
-mkdir -p ${blat_gap_ptalen_DIR}
-cd ${blat_gap_ptalen_DIR}
-for i in ${SAMPLE}
+cd ${run_DIR}/ptalen
+ln -s ${data_DIR}/Seq.t_Lg${GAP_MINSIZE}.table .
+
+\rm Seq.t_pTALENs-on-${REFSEQNAME}.assoct
+len=`awk 'END { print NR }' Seq.t_Lg${GAP_MINSIZE}.table`
+# Note that the first row is the header "Tname tGapStart tGapSize Samples"
+for ((k=2; k<=$len; k++))
 do
-QUERY=${i}-${SEQ}
-QUERYNAME=${i}.${SEQNAME}
-# make a table with these info:
-# Q_name T_name Q_gap_count Q_gap_bases T_gap_count T_gap_bases block_count blockSizes tStarts TALEN1_start TALEN2_start
-awk '{ print $1,$2,$7,$8,$9,$10,$18,$19,$21,$22,$23 }' blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.\
-1.s
-head -1 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.s > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.sh
-tail -n +2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.s > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.st
+head -$k Seq.t_Lg${GAP_MINSIZE}.table | tail -1 > Trec
+cut -d " " -f1 rec > Trec.Tname
+cut -d " " -f2 rec > Trec.tGapStart
+cut -d " " -f3 rec > Trec.tGapSize
+cut -d " " -f4 rec > Trec.Samples
 
-len=`awk 'END { print NR }' blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.st`
-\rm blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.overlap
-for ((k=1; k<=$len; k++))
+# This is to loop over the ptalen table for associated pTALEN site
+row=`awk 'END { print NR }' pairedtalesf.pTALENs-on-${REFSEQNAME}.txt`
+for ((m=1; m<=$row; m++))
 do
-head -$k blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.st | tail -1 > rec
-cut -d " " -f1 rec > rec.Qname
-cut -d " " -f2 rec > rec.Tname
-cut -d " " -f4 rec > rec.QgapBases
-cut -d " " -f6 rec > rec.TgapBases
-cut -d " " -f7 rec > rec.blockCount
-cut -d " " -f8 rec > rec.blockSizes
-cut -d " " -f9 rec > rec.tStarts
-cut -d " " -f10 rec > rec.talen1Start
-cut -d " " -f11 rec > rec.talen2Start
+cut -d "\t" -f1 Prec.SeqName
+cut -d "\t" -f2 Prec.TAL_1_Start
+cut -d "\t" -f3 Prec.TAL_2_Start
+cut -d "\t" -f4 Prec.TAL_1_Target
+cut -d "\t" -f5 Prec.TAL_2_Target
+cut -d "\t" -f6 Prec.TAL_1
+cut -d "\t" -f7 Prec.TAL_2
+cut -d "\t" -f8 Prec.TAL_1_Score
+cut -d "\t" -f9 Prec.TAL_2_Score
+cut -d "\t" -f10 Prec.PTALEN
 
-blockCount=`cat rec.blockCount`
-\rm rec.overlap
-for ((m=1; m<$blockCount; m++))
-do
-Qname=`cat rec.Qname`
-Tname=`cat rec.Tname`
-QgapBases=`cat rec.QgapBases`
-TgapBases=`cat rec.TgapBases`
-tStart=`cut -d"," -f $m rec.tStarts`
-tSize=`cut -d"," -f $m rec.blockSizes`
-tEnd=`expr $tStart + $tSize`
-next=`expr $m + 1`
-tStartNext=`cut -d"," -f $next rec.tStarts`
-tSizeNext=`cut -d"," -f $next rec.blockSizes`
-tEndNext=`expr $tStartNext + $tSizeNext`
-gapSize=`expr $tStartNext - $tEnd`
-pTalen1=`cat rec.talen1Start`
-pTalen2=`cat rec.talen2Start`
-echo "$Qname $Tname $QgapBases $TgapBases $blockCount $tStart $tEnd $tStartNext $tEndNext $gapSize $pTalen1 $pTalen2" >> rec.overlap
-done
+Tname=`cat Trec.Tname`
+tGapStart=`cat Trec.tGapStart`
+tGapSize=`cat Trec.tGapSize`
+tGapEnd=`expr $tGapStart + $tGapSize`
 
+Pname=`cat Prec.SeqName`
+pTAL1Start=`cat Prec.TAL_1_Start`
+pTAL2Start=`cat Prec.TAL_2_Start`
+pTAL1Target=`cat Prec.TAL_1_Target`
+pTAL2Target=`cat Prec.TAL_2_Target`
+pTAL1Rvd=`cat Prec.TAL_1`
+pTAL2Rvd=`cat Prec.TAL_2`
+pTAL1Score=`cat Prec.TAL_1_Score`
+pTAL2Score=`cat Prec.TAL_2_Score`
+pTALEN=`cat Prec.PTALEN`
 
-awk -v Plen=${PTALEN_LEN} -v Pdel=${PTALEN_INDEL} '{ OFS="\t"; if ($11<$7 && ($7-$11)<(Plen+Pdel)) print $0 ; \
-else if ($11>=$7 && $11<$8) print $0; else if ($11>=$8 && ($11-$8)<Pdel) print $0 }' rec.overlap >> blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.ove\
-rlap
-
-done
-
-join -1 2 -2 2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.3 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.overlap \
-> blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap
-
-#Join to have the gene name for the iLocus
-join -1 1 -2 2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap ${ilocus_DIR}/${ILOCUSNAME}.genemap \
-> tmp && \mv tmp blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap
-
-echo "T_name Q_name match mis-match rep_match nCount Q_gap_count Q_gap_bases T_gap_count T_gap_bases strand Q_size Q_start Q_end T_size T_start T_e\
-nd block_count blockSizes qStarts tStarts TALEN1_start TALEN2_start Spacer_Length TAL_1_Target TAL_2_Target TAL_1 TAL_2 TAL_1_Score TAL_2_Score pTA\
-LEN Qname QgapBases TgapBases blockCount tStart tEnd tStartNext tEndNext gapSize pTalen1 pTalen2 T_GeneName" | cat - blat.${DB_PTALEN}.${QUERYNAME}\
-.psl.awk.join.1.overlap > tmp &&\
-\mv tmp blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap
+if [ ${Tname} == ${Pname} ]; then
+    if [ ${pTAL1Start} < ${tGapStart} \& `exp ${tGapStart} - ${pTAL1Start}` < `exp ${PLEN} + ${PDEL}` ]; then
+	echo "${Tname} ${tGapStart} ${tGapEnd} ${tGapSize} ${pTAL1Start} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.assoct
+    elif [ ${pTAL1Start} >= ${tGapStart} \& ${pTAL1Start} < ${tGapEnd} ]; then
+	echo "${Tname} ${tGapStart} ${tGapEnd} ${tGapSize} ${pTAL1Start} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.assoct
+    elif [ ${pTAL1Start} > ${tGapEnd} \& `exp  ${pTAL1Start} - ${tGapEnd}` < ${PDEL} ]; then
+	echo "${Tname} ${tGapStart} ${tGapEnd} ${tGapSize} ${pTAL1Start} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.assoct
+    fi
+fi
 
 
-# Rearrange columns original
-# 1 T_name 2 Q_name 3 match 4 mis-match 5 rep_match 6 nCount 7 Q_gap_count 8 Q_gap_bases 9 T_gap_count 10 T_gap_bases 11 strand
-# 12 Q_size 13 Q_start 14 Q_end 15 T_size 16 T_start 17 T_end 18 block_count 19 blockSizes 20 qStarts 21 tStarts
-# 22 TALEN1_start 23 TALEN2_start 24 Spacer_Length 25 TAL_1_Target 26 TAL_2_Target 27 TAL_1 28 TAL_2 29 TAL_1_Score 30 TAL_2_Score 31 pTALEN
-# 32 Q_name 33 QgapBases 34 TgapBases 35 blockCount 36 tStart 37 tEnd 38 tStartNext 39 tEndNext 40 gapSize 41 pTalen1 42 pTalen2 43 T_GeneName
 
-# Rearrange columns to:
-# 2 Q_name 1 T_name 43 T_GeneName 8 Q_gap_bases 10 T_gap_bases 12 Q_size 13 Q_start 14 Q_end 15 T_size 16 T_start 17 T_end
-# 18 block_count 19 blockSizes 20 qStarts 21 tStarts
-# 36 tStart 37 tEnd 40 gapSize 38 tStartNext 39 tEndNext
-# 22 TALEN1_start 23 TALEN2_start 24 Spacer_Length 25 TAL_1_Target 26 TAL_2_Target
-# 27 TAL_1 28 TAL_2 29 TAL_1_Score 30 TAL_2_Score 31 pTALEN
 
-awk '{ print $2,$1,$43,$8,$10,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$36,$37,$40,$38,$39,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31 }' blat.${DB_PTAL\
-EN}.${QUERYNAME}.psl.awk.join.1.overlap > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.1
-head -1 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.2
-tail -n+2 blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.1 > blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.3
+
+awk -v Plen=${PTALEN_LEN} -v Pdel=${PTALEN_INDEL} '{ OFS="\t"; if ($pTalen1<$GapStart && ($GapStart-$pTalen1)<(Plen+Pdel)) print $0 ; \
+else if ($pTalen1>=$GapStart && $pTalen1<$GapEnd) print $0; else if ($pTalen1>=$GapEnd && ($pTalen1-$GapEnd)<Pdel) print $0 }' rec.overlap >> blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.overlap
+
+
 done
 
 
