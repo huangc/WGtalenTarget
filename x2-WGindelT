@@ -53,9 +53,11 @@ do
 QUERY=${i}-${SEQ}
 QUERYNAME=${i}.${SEQNAME}
 tail -n+6 blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl > blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl.tailer
-awk -v gap_minnum="${GAP_MINNUM}" -v gap_minsize="${GAP_MINSIZE}" '{ OFS="\t"; if ( $5 > gap_minnum && $6 > gap_minsize ) print $0 }'\
+awk -v gap_minnum="${GAP_MINNUM}" -v gap_minsize="${GAP_MINSIZE}" -v gap_maxsize="${GAP_MAXSIZE}" \
+'{ OFS="\t"; if ( $5 > gap_minnum && $6 > gap_minsize && $6 < gap_maxsize ) print $0 }'\
  blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl.tailer > blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl.tailer.Q.awk
-awk -v gap_minnum="${GAP_MINNUM}" -v gap_minsize="${GAP_MINSIZE}" '{ OFS="\t"; if ( $7 > gap_minnum && $8 > gap_minsize ) print $0 }'\
+awk -v gap_minnum="${GAP_MINNUM}" -v gap_minsize="${GAP_MINSIZE}" -v gap_maxsize="${GAP_MAXSIZE}" \
+'{ OFS="\t"; if ( $7 > gap_minnum && $8 > gap_minsize && $8 < gap_maxsize ) print $0 }'\
  blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl.tailer > blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl.tailer.T.awk
 cat blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl.tailer.Q.awk blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl.tailer.T.awk | sort -k14,14 \
  > blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl.awk
