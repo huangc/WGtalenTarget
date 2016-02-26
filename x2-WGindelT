@@ -55,11 +55,6 @@ QUERYNAME=${i}.${SEQNAME}
 tail -n+6 blat.${DB_REFSEQ}.${QUERYNAME}.Reps.psl |\
 awk -v gap_minnum="${GAP_MINNUM}" '{ OFS="\t"; if ( $5 >= gap_minnum || $7 >= gap_minnum ) print $0 }'\
  > blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps
-
-echo "match mis-match rep_match nCount Q_gap_count Q_gap_bases T_gap_count T_gap_bases \
-strand Q_name Q_size Q_start Q_end T_name T_size T_start T_end \
-block_count blockSizes qStarts tStarts" | cat - blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps \
-> blat.${DB_REFSEQ}.${QUERYNAME}.psl.Gaps
 done
 
 #-----
@@ -76,8 +71,9 @@ QUERY=${i}-${SEQ}
 QUERYNAME=${i}.${SEQNAME}
 awk '{ print $10,$14,$5,$6,$7,$8,$11,$12,$13,$15,$16,$17,$18,$19,$20,$21 }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps\
  | sort -k 2.6 -n -t " " > tmp && \mv tmp blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps
-awk '{ print $10,$14,$5,$6,$7,$8,$11,$12,$13,$15,$16,$17,$18,$19,$20,$21 }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.Gaps\
- | sort -k 2.6 -n -t " " > tmp && \mv tmp blat.${DB_REFSEQ}.${QUERYNAME}.psl.Gaps
+echo "Q_name T_name Q_gap_count Q_gap_bases T_gap_count T_gap_bases \
+Q_size Q_start Q_end T_size T_start T_end block_count blockSizes qStarts tStarts" |\
+cat - blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps > blat.${DB_REFSEQ}.${QUERYNAME}.psl.Gaps
 done
 
 # 
