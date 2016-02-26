@@ -110,3 +110,5 @@ PLEN=60
 # PDEL: the distance (bp) from the near edge of pTALEN to the near edge of deletion site. 
 PDEL=100 
 
+## Set the border size (bp) from gap for retrieving sequence for alignment
+GAP_BORDER=400
