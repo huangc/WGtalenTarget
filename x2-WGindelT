@@ -70,7 +70,7 @@ do
 QUERY=${i}-${SEQ}
 QUERYNAME=${i}.${SEQNAME}
 awk '{ print $10,$14,$5,$6,$7,$8,$11,$12,$13,$15,$16,$17,$18,$19,$20,$21 }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps\
- | sort -k 2.6 -n -t " " > tmp && \mv tmp blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps
+ | sort -k 2 -t " " > tmp && \mv tmp blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps
 echo "Q_name T_name Q_gap_count Q_gap_bases T_gap_count T_gap_bases \
 Q_size Q_start Q_end T_size T_start T_end block_count blockSizes qStarts tStarts" |\
 cat - blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps > blat.${DB_REFSEQ}.${QUERYNAME}.psl.Gaps
@@ -170,10 +170,10 @@ do
 QUERY=${i}-${SEQ}
 QUERYNAME=${i}.${SEQNAME}
 
-awk -v gap_minsize="${GAP_MINSIZE}" -v gap_maxsize="${GAP_MAXSIZE}" '{ OFS="\t"; if ( $15 >= gap_minsize && $15 <= gap_maxsize ) print $0 }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap | sort -t " " -k2.6 -n | uniq > blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.t
+awk -v gap_minsize="${GAP_MINSIZE}" -v gap_maxsize="${GAP_MAXSIZE}" '{ OFS="\t"; if ( $15 >= gap_minsize && $15 <= gap_maxsize ) print $0 }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap | sort -t " " -k2 | uniq > blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.t
 echo "Qname Tname QgapCount QgapBases TgapCount TgapBases blockCount qStart qEnd qGapSize qStartNext qEndNext tStart tEnd tGapSize tStartNext tEndNext" | cat - blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.t > blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.T
 
-awk -v gap_minsize="${GAP_MINSIZE}" -v gap_maxsize="${GAP_MAXSIZE}" '{ OFS="\t"; if ( $10 >= gap_minsize && $10 <= gap_maxsize ) print $0 }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap | sort -t " " -k2.6 -n | uniq > blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.q
+awk -v gap_minsize="${GAP_MINSIZE}" -v gap_maxsize="${GAP_MAXSIZE}" '{ OFS="\t"; if ( $10 >= gap_minsize && $10 <= gap_maxsize ) print $0 }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap | sort -t " " -k2 | uniq > blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.q
 echo "Qname Tname QgapCount QgapBases TgapCount TgapBases blockCount qStart qEnd qGapSize qStartNext qEndNext tStart tEnd tGapSize tStartNext tEndNext" | cat - blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.q > blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.Q
 
 done
@@ -184,7 +184,7 @@ done
 # locus12345 1114 0 1357246 2476 500 YB1;YB2;YB4;YB5;YB6;YB8;
 # Note "q" (query) is for insertion, and "t" (target) is for deletion.
 
-for indel in q t
+for indel in t_onQ t_sum
 do
 cd ${run_DIR}
 mkdir -p ${indel}
@@ -194,12 +194,12 @@ for i in ${SAMPLE}
 do
 QUERY=${i}-${SEQ}
 QUERYNAME=${i}.${SEQNAME}
-cp ${run_DIR}/blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.${indel} .
+cp ${run_DIR}/blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.t .
 
-len=`awk 'END { print NR }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.${indel}`
+len=`awk 'END { print NR }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.t`
 for ((k=1; k<=$len; k++))
 do
-head -$k blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.${indel} | tail -1 > rec
+head -$k blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap.t | tail -1 > rec
 
 cut -d " " -f1 rec > rec.Qname
 cut -d " " -f2 rec > rec.Tname
@@ -217,12 +217,12 @@ tEnd=`cat rec.tEnd`
 tGapStart=$tEnd
 tGapSize=`cat rec.tGapSize`
 
-if [ ${indel} == "q" ]; then
+if [ ${indel} == "t_onQ" ]; then
     echo "$i" >> $Tname.$tGapStart.$tGapSize.$Qname.$qGapStart.$qGapSize.sample
-elif [ ${indel} == "t" ]; then
+elif [ ${indel} == "t_sum" ]; then
     echo "$i" >> $Tname.$tGapStart.$tGapSize.sample
 else 
-    echo "This is neither insertion nor deletion" >> err_indel
+    echo "Error does happen" >> err_indel
 fi
 
 
@@ -246,14 +246,14 @@ done
 # Aggregate the above file contents about indel-sample into a table
 grep '' /dev/null *.sample > iloci.table
 # convert . and : into tab
-if [ ${indel} == "q" ]; then
+if [ ${indel} == "t_onQ" ]; then
     sed 's/\./\t/g' iloci.table | sed 's/\:/\t/g' | \
-	awk '{ FS="\t"; print $1,$2,$3,$4,$5,$6,$8 }' | sort -k1.6 -n > tmp && \mv tmp iloci.table
-elif [ ${indel} == "t" ]; then
+	awk '{ FS="\t"; print $1,$2,$3,$4,$5,$6,$8 }' | sort -k1 > tmp && \mv tmp iloci.table
+elif [ ${indel} == "t_sum" ]; then
     sed 's/\./\t/g' iloci.table | sed 's/\:/\t/g' | \
-	awk '{ FS="\t"; print $1,$2,$3,$5 }' | sort -k1.6 -n > tmp && \mv tmp iloci.table
+	awk '{ FS="\t"; print $1,$2,$3,$5 }' | sort -k1 > tmp && \mv tmp iloci.table
 else
-    echo "This is neither insertion nor deletion" >> err_indel
+    echo "Error does happen" >> err_indel
 fi
 
 ##---------------------------
@@ -262,44 +262,11 @@ fi
 \cp iloci.table ILOCI.LIST
 \cp iloci.table Seq.${indel}_Lg${GAP_MINSIZE}.table
 
-if [ ${indel} == "q" ]; then
+if [ ${indel} == "t_onQ" ]; then
     echo "Tname tGapStart tGapSize Qname qGapStart qGapSize Samples" | cat - Seq.${indel}_Lg${GAP_MINSIZE}.table > tmp && \
 \mv tmp Seq.${indel}_Lg${GAP_MINSIZE}.table
 
-    for i in ${SAMPLE}
-    do
-	grep $i ILOCI.LIST > ILOCI.LIST_${i}
-	len=`awk 'END { print NR }' ILOCI.LIST_${i}`
-	\rm Seq.${indel}_Lg${GAP_MINSIZE}_${i}.fasta
-
-	for ((k=1; k<=$len; k++))
-	do
-	    head -$k ILOCI.LIST_${i} | tail -1 > rec
-	    cut -d " " -f1 rec > rec.Tname
-	    cut -d " " -f2 rec > rec.tGapStart
-	    cut -d " " -f3 rec > rec.tGapSize
-	    cut -d " " -f4 rec > rec.Qname
-	    cut -d " " -f5 rec > rec.qGapStart
-	    cut -d " " -f6 rec > rec.qGapSize
-	    cut -d " " -f7 rec > rec.Samples
-
-	    tGapStart=`cat rec.tGapStart`
-	    tGapSize=`cat rec.tGapSize`
-	    tGapEnd=`expr $tGapStart + $tGapSize`
-	    qGapStart=`cat rec.qGapStart`
-	    qGapSize=`cat rec.qGapSize`
-	    qGapEnd=`expr $qGapStart + $qGapSize`
-	    Samples=`cat rec.Samples`
-
-	    query=`cat rec.Qname`
-	    blastdbcmd -db ${prereq_DIR}/DB_${i}_contig -entry "lcl|${query}" -dbtype nucl -outfmt "%f" -out ${i}-${query}.fa
-	    sed -i -e "s/>lcl|/>/" ${i}-${query}.fa
-	    python getTarget.py ${i}-${query}.fa ${i}-${query}_GAP_${qGapStart}_${qGapEnd} ${qGapStart} ${qGapEnd}
-	    sed -i "s/^>${query}/>${i}-${query}_GAP_${qGapStart}_${qGapEnd}/" ${i}-${query}_GAP_${qGapStart}_${qGapEnd}.fasta
-	    cat ${i}-${query}_GAP_${qGapStart}_${qGapEnd}.fasta >> Seq.${indel}_Lg${GAP_MINSIZE}_${i}.fasta
-	done
-    done
-elif [ ${indel} == "t" ]; then
+elif [ ${indel} == "t_sum" ]; then
     echo "Tname tGapStart tGapSize Samples" | cat - Seq.${indel}_Lg${GAP_MINSIZE}.table > tmp && \
 \mv tmp Seq.${indel}_Lg${GAP_MINSIZE}.table
 
@@ -328,8 +295,6 @@ elif [ ${indel} == "t" ]; then
 	    cat ${i}-${query}_GAP_${tGapStart}_${tGapEnd}.fasta >> Seq.${indel}_Lg${GAP_MINSIZE}_${i}.fasta
 	done
     done
-else
-    echo "This is neither insertion nor deletion" >> err_indel
 fi
 
 done
@@ -337,7 +302,7 @@ done
 ##---------------------------
 #7. Report
 cd ${data_DIR}
-for indel in q t
+for indel in t_onQ t_sum
 do
 \cp ${run_DIR}/${indel}/Seq*_Lg* .
 done
