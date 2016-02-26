@@ -112,3 +112,4 @@ PDEL=100
 
 ## Set the border size (bp) from gap for retrieving sequence for alignment
 GAP_BORDER=400
+
