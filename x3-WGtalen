@@ -9,7 +9,7 @@ module add blat
 
 # Aims: To investigate the Whole-Genome (WG) insertion/deletion (indel) profile of rice genomic samples under TALEN treatment.
 # Author: Chun-Yuan Huang, Ph.D.
-# Last Update: 2/22/2016
+# Last Update: 2/26/2016
 
 ##-------------------------------------------
 ## Workflow description:
@@ -71,25 +71,30 @@ tail -n+4 >> pairedtalesf.pTALENs-on-${REFSEQNAME}.txt
 done
 
 #3. Generate the join table that contain the "associated" pTALEN and indels, 
-# which are defined as having their distance within ${PTALEN_INDEL} bp.
+# where "associated" is defined as having their distance within ${PDEL} bp.
 # Join the tables by Tname(#1), tGapStart(#2), tGapSize(#3)
 #
 cd ${run_DIR}/ptalen
-ln -s ${data_DIR}/Seq.t_Lg${GAP_MINSIZE}.table .
+\cp ${data_DIR}/Seq.t_onQ_Lg${GAP_MINSIZE}.table Seq.t_Lg${GAP_MINSIZE}.table
 
 \rm Seq.t_pTALENs-on-${REFSEQNAME}.out
 \rm Seq.t_pTALENs-on-${REFSEQNAME}.err
-len=`awk 'END { print NR }' Seq.t_Lg${GAP_MINSIZE}.table`
-# Note that the first row is the header "Tname tGapStart tGapSize Samples"
+len=`awk 'END { print NR }' Seq.t_onQ_Lg${GAP_MINSIZE}.table`
+# Note that the first row is the header 
+# "Tname tGapStart tGapSize Qname qGapStart qGapSize Samples"
+
 for ((k=2; k<=$len; k++))
 do
 head -$k Seq.t_Lg${GAP_MINSIZE}.table | tail -1 > Trec
 cut -d " " -f1 Trec > Trec.Tname
 cut -d " " -f2 Trec > Trec.tGapStart
 cut -d " " -f3 Trec > Trec.tGapSize
-cut -d " " -f4 Trec > Trec.Samples
+cut -d " " -f4 Trec > Trec.Qname
+cut -d " " -f5 Trec > Trec.qGapStart
+cut -d " " -f6 Trec > Trec.qGapSize
+cut -d " " -f7 Trec > Trec.Samples
 
-# This is to loop over the ptalen table for associated pTALEN site
+# Now loop over the ptalen table for associated pTALEN site
 row=`awk 'END { print NR }' pairedtalesf.pTALENs-on-${REFSEQNAME}.txt`
 for ((m=4; m<=$row; m++))
 do
@@ -110,6 +115,10 @@ Tname=`cat Trec.Tname`
 tGapStart=`cat Trec.tGapStart`
 tGapSize=`cat Trec.tGapSize`
 tGapEnd=`expr $tGapStart + $tGapSize`
+Qname=`cat Trec.Qname`
+qGapStart=`cat Trec.qGapStart`
+qGapSize=`cat Trec.qGapSize`
+qGapEnd=`expr $qGapStart + $qGapSize`
 
 Pname=`cat Prec.SeqName`
 pTAL1Start=`cat Prec.TAL_1_Start`
@@ -125,59 +134,94 @@ pTALEN=`cat Prec.PTALEN`
 
 if [[ ${Tname} = ${Pname} ]]; then
     if (( ${pTAL1Start} < ${tGapStart} && `expr ${tGapStart} - ${pTAL1Start}` < `expr ${PLEN} + ${PDEL}` )); then
-	echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+	echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Qname} ${qGapStart} ${qGapSize} ${qGapEnd}\
+ ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
  ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
     elif (( ${pTAL1Start} >= ${tGapStart} && ${pTAL1Start} < ${tGapEnd} )); then
-	echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+        echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Qname} ${qGapStart} ${qGapSize} ${qGapEnd}\
+ ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
  ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
     elif (( ${pTAL1Start} > ${tGapEnd} && `expr  ${pTAL1Start} - ${tGapEnd}` < ${PDEL} )); then
-	echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+        echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Qname} ${qGapStart} ${qGapSize} ${qGapEnd}\
+ ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
  ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
     else
-	echo "${Tname}-${tGapStart}-${tGapEnd} is not paired-TALEN target for ${Pname}-${pTAL1Start}-${pTAL2Start}" \
->> Seq.t_pTALENs-on-${REFSEQNAME}.err
+	echo "Deletion at ${Tname}-${tGapStart}-${tGapEnd} does not match pTALEN at\
+ ${Pname}-${pTAL1Start}-${pTAL2Start}" >> Seq.t_pTALENs-on-${REFSEQNAME}.err
     fi
 fi
 
 done
 done
 
-echo "Tname tGapStart tGapSize tGapEnd pTAL1Start pSpacerLen pTAL2Start pTAL1Target pTAL2Target \
-pTAL1Rvd pTAL2Rvd pTAL1Score pTAL2Score pTALEN" | cat - Seq.t_pTALENs-on-${REFSEQNAME}.out > Seq.t_pTALENs-on-${REFSEQNAME}.OUT
+echo "Tname tGapStart tGapSize tGapEnd Qname qGapStart qGapSize qGapEnd pTAL1Start pSpacerLen pTAL2Start\
+ pTAL1Target pTAL2Target pTAL1Rvd pTAL2Rvd pTAL1Score pTAL2Score pTALEN" |\
+ cat - Seq.t_pTALENs-on-${REFSEQNAME}.out > Seq.t_pTALENs-on-${REFSEQNAME}.OUT
 
 
 #-----
-#8. Extract the blat alignemnts (#4) according to the #7 iLoci hits for final inspection.
+#4. Retrieve the blat alignemnts according to the associated pTALEN-Del table 
 #
-# Note that a ilocus that contains indel at a low complexity region may not be considered a good candidate.
+# Note that a deletion at low complexity region may not be considered a good pTALEN target candidate.
 #
-mkdir -p ${blat_gap_ptalen_overlap_DIR}
-cd ${blat_gap_ptalen_overlap_DIR}
+cd ${run_DIR}
+mkdir blat_at_pTALENdel
+cd blat_at_pTALENdel
+\cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.out .
+\cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.OUT .
+
 for i in ${SAMPLE}
 do
 QUERY=${i}-${SEQ}
 QUERYNAME=${i}.${SEQNAME}
 \rm ${DB_PTALEN}.${QUERYNAME}.alignment.report
-\cp ${blat_gap_ptalen_DIR}/blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.1 ${DB_PTALEN}.${QUERYNAME}.indel.overlap
-\cp ${blat_gap_ptalen_DIR}/blat.${DB_PTALEN}.${QUERYNAME}.psl.awk.join.1.overlap.3 ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader
-
-len=`awk 'END { print NR }' ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader`
+\cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.out .
+\cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.OUT .
+\rm Seq.t_pTALEN_GapBorder${GAP_BORDER}_${i}.fasta
+\rm Seq.q_pTALEN_GapBorder${GAP_BORDER}_${i}.fasta
+len=`awk 'END { print NR }' Seq.t_pTALENs-on-${REFSEQNAME}.out`
 
 for ((k=1; k<=$len; k++))
 do
-query=`head -$k ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader | tail -1 | cut -d " " -f 1`
-ilocus=`head -$k ${DB_PTALEN}.${QUERYNAME}.indel.overlap.nHeader | tail -1 | cut -d " " -f 2`
-blastdbcmd -db ${prereq_DIR}/DB_${i}_contig -entry "lcl|${query}" -dbtype nucl -outfmt "%f" -out ${i}-${query}.fa
-sed -i -e "s/>lcl|/>/" ${i}-${query}.fa
-blastdbcmd -db ${ptalen_DIR}/${DB_PTALEN} -entry ${ilocus} -dbtype nucl -outfmt "%f" -out ${ilocus}.fa
-sed -i -e "s/>lcl|/>/" ${ilocus}.fa
+head -$k Seq.t_pTALENs-on-${REFSEQNAME}.out | tail -1 > rec
+cut -d " " -f1 Trec > Trec.Tname
+cut -d " " -f2 Trec > Trec.tGapStart
+cut -d " " -f4 Trec > Trec.tGapEnd
+cut -d " " -f5 Trec > Trec.Qname
+cut -d " " -f6 Trec > Trec.qGapStart
+cut -d " " -f8 Trec > Trec.qGapEnd
 
-blat -t=dna -q=dna -out=psl -minIdentity=${PERC_IDENTITY} -minScore=${MIN_SCORE} ${ilocus}.fa ${i}-${query}.fa \
-blat.${i}-${query}-on-${ilocus}.psl
-blat -t=dna -q=dna -out=blast -minIdentity=${PERC_IDENTITY} -minScore=${MIN_SCORE} ${ilocus}.fa ${i}-${query}.fa \
-blat.${i}-${query}-on-${ilocus}.blast
-pslPretty blat.${i}-${query}-on-${ilocus}.psl ${ilocus}.fa ${i}-${query}.fa blat.${i}-${query}-on-${ilocus}.psl.pretty
-pslPretty -long blat.${i}-${query}-on-${ilocus}.psl ${ilocus}.fa ${i}-${query}.fa blat.${i}-${query}-on-${ilocus}.psl.pretty.long
+Tname=`cat Trec.Tname`
+tGapStart=`cat Trec.tGapStart`
+tGapEnd=`cat Trec.tGapEnd`
+Qname=`cat Trec.Qname`
+qGapStart=`cat Trec.qGapStart`
+qGapEnd=`cat Trec.qGapEnd`
+
+python ${bin_DIR}/getTarget.py ${prereq_DIR}/${Tname}.fa ${i}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}\
+ `expr ${tGapStart} - ${GAP_BORDER}` `expr ${tGapEnd} + ${GAP_BORDER}`
+sed -i "s/^>${Tname}/>${i}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}/" ${i}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta
+cat ${i}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta >> Seq.t_pTALEN_GapBorder${GAP_BORDER}_${i}.fasta
+
+blastdbcmd -db ${prereq_DIR}/DB_${i}_contig -entry "lcl|${Qname}" -dbtype nucl -outfmt "%f" -out ${i}-${Qname}.fa
+sed -i -e "s/>lcl|/>/" ${i}-${Qname}.fa
+python ${bin_DIR}/getTarget.py ${i}-${Qname}.fa ${i}-${Qname}_GapBorder${GAP_BORDER}_${qGapStart}_${qGapEnd}\
+ `expr ${qGapStart} - ${GAP_BORDER}` `expr ${qGapEnd} + ${GAP_BORDER}`
+sed -i "s/^>${Qname}/>${i}-${Qname}_GapBorder${GAP_BORDER}_${qGapStart}_${qGapEnd}/" ${i}-${Qname}_GapBorder${GAP_BORDER}_${qGapStart}_${qGapEnd}.fasta
+cat ${i}-${Qname}_GapBorder${GAP_BORDER}_${qGapStart}_${qGapEnd}.fasta >> Seq.q_pTALEN_GapBorder${GAP_BORDER}_${i}.fasta
+
+blat -t=dna -q=dna -out=psl -minIdentity=${PERC_IDENTITY} -minScore=${MIN_SCORE}\
+ ${i}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta\
+ ${i}-${Qname}_GapBorder${GAP_BORDER}_${qGapStart}_${qGapEnd}.fasta\
+ blat.${i}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl
+pslPretty blat.${i}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl\
+ ${i}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta\
+ ${i}-${Qname}_GapBorder${GAP_BORDER}_${qGapStart}_${qGapEnd}.fasta\
+ blat.${i}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl.pretty
+pslPretty -long blat.${i}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl\
+ ${i}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta\
+ ${i}-${Qname}_GapBorder${GAP_BORDER}_${qGapStart}_${qGapEnd}.fasta\
+ blat.${i}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl.pretty.long
 
 done
 done
