@@ -1,0 +1,201 @@
+#!/bin/bash
+#PBS -m abe
+#PBS -l nodes=1:ppn=20,vmem=20gb,walltime=10:00:00
+#PBS -N WGtalen
+#PBS -j oe
+
+module add python
+module add blat
+
+# Aims: To investigate the Whole-Genome (WG) insertion/deletion (indel) profile of rice genomic samples under TALEN treatment.
+# Author: Chun-Yuan Huang, Ph.D.
+# Last Update: 2/26/2016
+
+##-------------------------------------------
+## Workflow description:
+#1. WG paired TALEN binding sites prediction using TALE-NT2 targetter
+#3. Extract sequences of iLoci that contain paired TALENs (pTALEN).
+#4. Blat of sample contigs against pTALEN (pTALEN from #3, sample contigs were assembled according to TRegGA workflow).
+#5. Generate filtered blat hits table (#4) for contigs that contain gaps whose total length larger than the defined size (4 bp).
+#6. Generate the join table of iLoci that contain both pTALEN (#3) and indels (#5).
+#7. Narrow down the #6 iLoci hits whose pTALEN (#3) is within the defined distance (100 bp) from the indel region (#5).
+#8. Extract the blat alignemnts (#4) according to the #7 iLoci hits for final inspection.
+
+
+cd $PBS_O_WORKDIR
+source ./0SOURCE
+cd ${run_DIR}
+
+#0. Prerequisite files
+# Deletion summary table: ${data_DIR}/Seq.t_Lg${GAP_MINSIZE}.table, generated from x2-WGindelT with the content:
+# "Tname tGapStart tGapSize Samples" 
+# TALEN RVD sequences: ${prereq_DIR}/pTALEN_*, generated from PREREQ.sh with the content: 
+# '"rvdseq1" "rvdseq2"'
+
+#-----
+#1. Make TALE-NT2 prediction of paied-TALEN binding sites on REFSEQ
+#
+mkdir -p ptalen
+cd ptalen
+\rm pairedtalesf.sh
+for p in ${PTALEN}
+do
+\cp -r ${prereq_DIR}/${p} .
+echo "
+#!/usr/bin/bash
+pairedtalesf \
+        -m ${TPO_m} \
+        -x ${TPO_x} \
+        -n ${TPO_n} \
+        -t ${TPO_t} \
+        -o pairedtalesf.${p}-on-${REFSEQNAME} \
+        ${prereq_DIR}/${REFSEQ} \
+        "`cat ${p}`"
+" >> pairedtalesf.sh
+done
+sh pairedtalesf.sh
+
+##-----
+#2. Rearrange columns of pTalen table and add ${PTALEN} for clarity.
+# Sequence_Name(#1)  ${PTALEN} TAL_1(#2) TAL_2(#3) TAL_1_Score(#4) TAL_2_Score(#5) 
+# TAL_1_Start(#6) TAL_2_Start(#7) Spacer_Length(#8) TAL_1_Target(#9) TAL_2_Target(#10).
+# Change the TAL_Target such that "T TCCTGAAGAATTGATTCACTTC" becomes "TTCCTGAAGAATTGATTCACTTC"
+
+cd ${run_DIR}/ptalen
+\rm pairedtalesf.pTALENs-on-${REFSEQNAME}.txt
+for p in ${PTALEN}
+do
+sed -r 's/\bT\s/T/g' pairedtalesf.${p}-on-${REFSEQNAME}.txt | \
+awk -v Rvd=${p} '{ FS="\t"; print $1,$6,$7,$8,$9,$10,$2,$3,$4,$5,Rvd }' | \
+tail -n+4 >> pairedtalesf.pTALENs-on-${REFSEQNAME}.txt
+done
+
+#3. Generate the join table that contain the "associated" pTALEN and indels, 
+# where "associated" is defined as having their distance within ${PDEL} bp.
+# Join the tables by Tname(#1), tGapStart(#2), tGapSize(#3)
+#
+cd ${run_DIR}/ptalen
+\cp ${data_DIR}/Seq.t_onQ_Lg${GAP_MINSIZE}.table Seq.t_Lg${GAP_MINSIZE}.table
+
+\rm Seq.t_pTALENs-on-${REFSEQNAME}.out
+\rm Seq.t_pTALENs-on-${REFSEQNAME}.err
+
+# First go through the list in the pTALEN binding site table
+row=`awk 'END { print NR }' pairedtalesf.pTALENs-on-${REFSEQNAME}.txt`
+for ((m=1; m<=$row; m++))
+do
+head -$m pairedtalesf.pTALENs-on-${REFSEQNAME}.txt | tail -1 > Prec
+Pname=`cut -d " " -f1 Prec`
+pTAL1Start=`cut -d " " -f2 Prec`
+pTAL2Start=`cut -d " " -f3 Prec`
+pSpacerLen=`cut -d " " -f4 Prec`
+pTAL1Target=`cut -d " " -f5 Prec`
+pTAL2Target=`cut -d " " -f6 Prec`
+pTAL1Rvd=`cut -d " " -f7 Prec`
+pTAL2Rvd=`cut -d " " -f8 Prec`
+pTAL1Score=`cut -d " " -f9 Prec`
+pTAL2Score=`cut -d " " -f10 Prec`
+pTALEN=`cut -d " " -f11 Prec`
+
+## Now look into the deletion table to find the associated deletion sites
+# Sort and grep the lines before and after pTALEN record in the deletin table, 
+# which are the potentially associated deletion sites.
+cat Prec Seq.t_Lg${GAP_MINSIZE}.table | grep "${Pname}" | sort -k2 -n |\
+ grep -B1 -A1 ${pTALEN} > Prec.${Pname}.${pTAL1Start}
+
+# Cases for how pTALEN (marked ==) can be associated with the deletion. 
+# Sequence is marked -----, blanks are deletions, while the associated deletion is xxxxx.
+# RefSeq  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------| 
+# Case1                                  |==|
+# Case2                                            |==|
+# Case3                                                       |==|
+# Case1. pTAL1Start is before the associated deletion
+# Case2. pTAL1Start is inside the associated deletion
+# Case3. pTAL1Start is after the associated deletion
+
+grep -v "${pTALEN}" Prec.${Pname}.${pTAL1Start} > Prec.${Pname}.${pTAL1Start}.deletion
+len=`awk 'END { print NR }' Prec.${Pname}.${pTAL1Start}.deletion`
+for ((p=1; p<=$len; p++))
+do
+head -$p Prec.${Pname}.${pTAL1Start}.deletion | tail -1 > Trec
+Tname=`cut -d " " -f1 Trec`
+tGapStart=`cut -d " " -f2 Trec`
+tGapSize=`cut -d " " -f3 Trec`
+tGapEnd=`expr $tGapStart + $tGapSize`
+Qname=`cut -d " " -f4 Trec`
+qGapStart=`cut -d " " -f5 Trec`
+qGapSize=`cut -d " " -f6 Trec`
+qGapEnd=`expr $qGapStart + $qGapSize`
+Samples=`cut -d " " -f7 Trec`
+
+if (( ${pTAL1Start} < ${tGapStart} && `expr ${tGapStart} - ${pTAL1Start}` < `expr ${PLEN} + ${PDEL}` )); then
+	echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Samples} ${Qname} ${qGapStart} ${qGapSize} ${qGapEnd}\
+ ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+ ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
+elif (( ${pTAL1Start} >= ${tGapStart} && ${pTAL1Start} < ${tGapEnd} )); then
+        echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Samples} ${Qname} ${qGapStart} ${qGapSize} ${qGapEnd}\
+ ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+ ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
+elif (( ${pTAL1Start} > ${tGapEnd} && `expr  ${pTAL1Start} - ${tGapEnd}` < ${PDEL} )); then
+        echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Samples} ${Qname} ${qGapStart} ${qGapSize} ${qGapEnd}\
+ ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
+ ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
+else
+	echo "Deletion at ${Tname}-${tGapStart}-${tGapEnd} does not match pTALEN at\
+ ${Pname}-${pTAL1Start}-${pTAL2Start}" >> Seq.t_pTALENs-on-${REFSEQNAME}.err
+fi
+
+done
+done
+
+echo "Tname tGapStart tGapSize tGapEnd Samples Qname qGapStart qGapSize qGapEnd pTAL1Start pSpacerLen pTAL2Start\
+ pTAL1Target pTAL2Target pTAL1Rvd pTAL2Rvd pTAL1Score pTAL2Score pTALEN" |\
+ cat - Seq.t_pTALENs-on-${REFSEQNAME}.out > Seq.t_pTALENs-on-${REFSEQNAME}.OUT
+
+
+#-----
+#4. Retrieve the blat alignemnts according to the associated pTALEN-Del table 
+#
+# Note that a deletion at low complexity region may not be considered a good pTALEN target candidate.
+#
+cd ${run_DIR}
+mkdir -p blat_at_pTALENdel
+cd blat_at_pTALENdel
+\cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.OUT .
+
+len=`awk 'END { print NR }' Seq.t_pTALENs-on-${REFSEQNAME}.OUT`
+for ((k=2; k<=$len; k++))
+do
+head -$k Seq.t_pTALENs-on-${REFSEQNAME}.OUT | tail -1 > rec
+Tname=`cut -d " " -f1 rec`
+tGapStart=`cut -d " " -f2 rec`
+tGapEnd=`cut -d " " -f4 rec`
+Samples=`cut -d " " -f5 rec | sed 's/;.*$//'`
+Qname=`cut -d " " -f6 rec`
+qGapStart=`cut -d " " -f7 rec`
+qGapEnd=`cut -d " " -f9 rec`
+
+python ${bin_DIR}/getTarget.py ${prereq_DIR}/${Tname}.fa ${Samples}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}\
+ `expr ${tGapStart} - ${GAP_BORDER}` `expr ${tGapEnd} + ${GAP_BORDER}`
+sed -i "s/^>${Tname}/>${Samples}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}/"\
+ ${Samples}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta
+
+blastdbcmd -db ${prereq_DIR}/DB_${Samples}_contig -entry "lcl|${Qname}" -dbtype nucl -outfmt "%f" -out ${Samples}-${Qname}.fa
+sed -i -e "s/>lcl|/>/" ${Samples}-${Qname}.fa
+
+blat -t=dna -q=dna -out=psl -minIdentity=${PERC_IDENTITY} -minScore=${MIN_SCORE}\
+ ${Samples}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta\
+ ${Samples}-${Qname}.fa blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl
+pslPretty blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl\
+ ${Samples}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta\
+ ${Samples}-${Qname}.fa blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl.pretty
+pslPretty -long blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl\
+ ${Samples}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta\
+ ${Samples}-${Qname}.fa blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl.pretty.long
+
+done
+
+#-----
+#DONE
+#-----
+
