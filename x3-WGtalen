@@ -75,7 +75,7 @@ done
 # Join the tables by Tname(#1), tGapStart(#2), tGapSize(#3)
 #
 cd ${run_DIR}/ptalen
-\cp ${data_DIR}/Seq.t_onQ_Lg${GAP_MINSIZE}.table Seq.t_Lg${GAP_MINSIZE}.table
+\cp ${run_DIR}/t_onQ/Seq.t_onQ_Lg${GAP_MINSIZE}.table Seq.t_Lg${GAP_MINSIZE}.table
 
 \rm Seq.t_pTALENs-on-${REFSEQNAME}.out
 \rm Seq.t_pTALENs-on-${REFSEQNAME}.err
@@ -194,6 +194,14 @@ pslPretty -long blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl
  ${Samples}-${Qname}.fa blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl.pretty.long
 
 done
+
+#5. Report
+cd ${data_DIR}
+\cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.OUT .
+mkdir -p blat_at_pTALENdel
+\cp -s ${run_DIR}/blat_at_pTALENdel/*.pretty* blat_at_pTALENdel
+
+rename Seq.t SeqDel Seq.t*
 
 #-----
 #DONE
