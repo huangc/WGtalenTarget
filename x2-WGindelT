@@ -231,6 +231,8 @@ else
     echo "Error does happen" >> err_indel
 fi
 
+done
+
 ##---------------------------
 #7. Report
 cd ${data_DIR}
