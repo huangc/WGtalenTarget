@@ -249,55 +249,17 @@ grep '' /dev/null *.sample > iloci.table
 if [ ${indel} == "t_onQ" ]; then
     sed 's/\./\t/g' iloci.table | sed 's/\:/\t/g' | \
 	awk '{ FS="\t"; print $1,$2,$3,$4,$5,$6,$8 }' | sort -k1 > tmp && \mv tmp iloci.table
+    echo "Tname tGapStart tGapSize Qname qGapStart qGapSize Samples" | \
+	cat - iloci.table > Seq.${indel}_Lg${GAP_MINSIZE}.table
+
 elif [ ${indel} == "t_sum" ]; then
     sed 's/\./\t/g' iloci.table | sed 's/\:/\t/g' | \
 	awk '{ FS="\t"; print $1,$2,$3,$5 }' | sort -k1 > tmp && \mv tmp iloci.table
+    echo "Tname tGapStart tGapSize Samples" | \
+	cat - iloci.table > Seq.${indel}_Lg${GAP_MINSIZE}.table
 else
     echo "Error does happen" >> err_indel
 fi
-
-##---------------------------
-#6. Use the summary indel table iloci.table (without geneID to avoid generating duplicates) to retrieve fasta sequences.
-\cp ${bin_DIR}/getTarget.py ${run_DIR}/${indel}/.
-\cp iloci.table ILOCI.LIST
-\cp iloci.table Seq.${indel}_Lg${GAP_MINSIZE}.table
-
-if [ ${indel} == "t_onQ" ]; then
-    echo "Tname tGapStart tGapSize Qname qGapStart qGapSize Samples" | cat - Seq.${indel}_Lg${GAP_MINSIZE}.table > tmp && \
-\mv tmp Seq.${indel}_Lg${GAP_MINSIZE}.table
-
-elif [ ${indel} == "t_sum" ]; then
-    echo "Tname tGapStart tGapSize Samples" | cat - Seq.${indel}_Lg${GAP_MINSIZE}.table > tmp && \
-\mv tmp Seq.${indel}_Lg${GAP_MINSIZE}.table
-
-    for i in ${SAMPLE}
-    do
-        grep $i ILOCI.LIST > ILOCI.LIST_${i}
-        len=`awk 'END { print NR }' ILOCI.LIST_${i}`
-        \rm Seq.${indel}_Lg${GAP_MINSIZE}_${i}.fasta
-
-        for ((k=1; k<=$len; k++))
-        do
-            head -$k ILOCI.LIST_${i} | tail -1 > rec
-            cut -d " " -f1 rec > rec.Tname
-            cut -d " " -f2 rec > rec.tGapStart
-            cut -d " " -f3 rec > rec.tGapSize
-            cut -d " " -f4 rec > rec.Samples
-
-            tGapStart=`cat rec.tGapStart`
-            tGapSize=`cat rec.tGapSize`
-            tGapEnd=`expr $tGapStart + $tGapSize`
-            Samples=`cat rec.Samples`
-
-	    query=`cat rec.Tname`
-	    python getTarget.py ${prereq_DIR}/${query}.fa ${i}-${query}_GAP_${tGapStart}_${tGapEnd} ${tGapStart} ${tGapEnd}
-	    sed -i "s/^>${query}/>${i}-${query}_GAP_${tGapStart}_${tGapEnd}/" ${i}-${query}_GAP_${tGapStart}_${tGapEnd}.fasta
-	    cat ${i}-${query}_GAP_${tGapStart}_${tGapEnd}.fasta >> Seq.${indel}_Lg${GAP_MINSIZE}_${i}.fasta
-	done
-    done
-fi
-
-done
 
 ##---------------------------
 #7. Report
@@ -307,6 +269,5 @@ do
 \cp ${run_DIR}/${indel}/Seq*_Lg* .
 done
 
-# rename Seq.q SeqIns Seq.q*
-# rename Seq.t SeqDel Seq.t*
+rename Seq.t SeqDel Seq.t*
 
