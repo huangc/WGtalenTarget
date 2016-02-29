@@ -100,7 +100,7 @@ pTALEN=`cut -d " " -f11 Prec`
 ## Now look into the deletion table to find the associated deletion sites
 # Sort and grep the lines before and after pTALEN record in the deletin table, 
 # which are the potentially associated deletion sites.
-cat Prec Seq.t_Lg${GAP_MINSIZE}.table | grep "${Pname}" | sort -k2 -n |\
+cat Prec Seq.t_Lg${GAP_MINSIZE}.table | grep -w "${Pname}" | sort -k2 -n |\
  grep -B1 -A1 ${pTALEN} > Prec.${Pname}.${pTAL1Start}
 
 # Cases for how pTALEN (marked ==) can be associated with the deletion. 
