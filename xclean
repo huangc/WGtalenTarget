@@ -5,12 +5,12 @@ cd ${WORK_DIR}
 ## Clean up the qsub error message files
 mv *.o* scratch/
 
-## Clean up the intermediate files
+## Clean up the blat intermediate files
 cd ${run_DIR}
 \rm -r *.Reps.psr
 \rm -r rec*
 
-## clean up *.sample, *.fasta and *.fa files
+## clean up deletion table *.sample, *.fasta and *.fa files
 for indel in t_onQ t_sum
 do
 cd ${run_DIR}/${indel}
@@ -24,5 +24,9 @@ mv *.fa ${run_DIR}/${indel}/file_contig
 mkdir -p ${run_DIR}/${indel}/file_gap
 mv *_GAP_*.fasta ${run_DIR}/${indel}/file_gap
 
-done
+## clean up ptalen intermediate files
+cd ${run_DIR}/ptalen
+mkdir -p ${run_DIR}/ptalen/deletion
+mv Prec* ${run_DIR}/ptalen/deletion
 
+done
