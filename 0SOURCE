@@ -107,9 +107,9 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 ## PLEN and PDEL are parameters to define the association between pTALEN site and deletion site.
 # Good candidate gap for pTALEN associated deletion would have small PDEL value.
 # PLEN: the estimated size (bp) of paired TALEN binding site from edge to edge and including the spacer.
-PLEN=60 
+PLEN=70
 # PDEL: the distance (bp) from the near edge of pTALEN to the near edge of deletion site. 
-PDEL=100 
+PDEL=10
 
 ## Set the border size (bp) from gap for retrieving sequence for alignment
 GAP_BORDER=400
