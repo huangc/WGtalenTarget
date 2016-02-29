@@ -12,17 +12,17 @@ run_DIR=${WORK_DIR}/run
 scratch_DIR=${WORK_DIR}/scratch
 
 # REFSEQ is the fasta file for reference genome, retrieved by bin/xgetseq, and located in prereq/. 
-# REFSEQ=OsjCHR.fa
-REFSEQ=OsjChr10.fa
+REFSEQ=OsjCHR.fa
+# REFSEQ=OsjChr10.fa
 # REFSEQNAME is the file name for REFSEQ without file extension.
-# REFSEQNAME=OsjCHR
-REFSEQNAME=OsjChr10
+REFSEQNAME=OsjCHR
+# REFSEQNAME=OsjChr10
 # REFGFF is the gene annotation gff3 file for REFSEQ, retrieved by bin/xgetseq, and located in prereq/.
 REFGFF=OsjCHR.gff3
 
 # SAMPLE is a list of sample names. Each sample name should be only one word.
-# SAMPLE="YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8"
-SAMPLE="ZHENGSHAN97test ZHENGSHAN97test2"
+SAMPLE="YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8"
+# SAMPLE="ZHENGSHAN97test ZHENGSHAN97test2"
 # denovo_DIR is the directory that stores the denovo-assembled contigs.
 denovo_DIR=/N/dc2/projects/brendelgroup/TRegGA/TRegGA_v1/assembly/denovo
 # In order for the workflow to parse the contigs correctly, 
@@ -34,10 +34,11 @@ SEQNAME="contig"
 # Add blast+ directory to the PATH
 export PATH=$PATH:/N/dc2/projects/brendelgroup/TRegGA/bin
 # export PATH=$PATH:${src_DIR}/blast/ncbi-blast-2.3.0+/bin
-# DB_REFDNA is the BlastDB name for reference whole genome.
-DB_REFDNA=OsjDNA
-# DB_REFSEQ is the BlastDB name for reference targeted region, such as individual chromosome OsjChr10
-DB_REFSEQ=OsjChr10
+# DB_REFSEQ is the BlastDB name for the reference sequence. 
+# Use OsjDNA for the whole genome
+DB_REFSEQ=OsjDNA
+# Use individual chromosome such as OsjChr10 for target region.
+# DB_REFSEQ=OsjChr10
 # OUTFMT is the tabular output format for BlastDB query
 OUTFMT="6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore gaps qcovs qcovhsp"
 EVALUE="1e-100"
