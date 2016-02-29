@@ -34,9 +34,9 @@ SEQNAME="contig"
 # Add blast+ directory to the PATH
 export PATH=$PATH:/N/dc2/projects/brendelgroup/TRegGA/bin
 # export PATH=$PATH:${src_DIR}/blast/ncbi-blast-2.3.0+/bin
-# DB_REFSEQ is the BlastDB name for the reference sequence. 
-# Use OsjDNA for the whole genome
-DB_REFSEQ=OsjDNA
+# DB_REFSEQ is the BlastDB name for the reference sequence.
+# Use OsjCHR for the whole genome
+DB_REFSEQ=OsjCHR
 # Use individual chromosome such as OsjChr10 for target region.
 # DB_REFSEQ=OsjChr10
 # OUTFMT is the tabular output format for BlastDB query
