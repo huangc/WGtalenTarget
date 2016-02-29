@@ -8,11 +8,10 @@ mv *.o* scratch/
 ## Clean up the intermediate files
 cd ${run_DIR}
 \rm -r *.Reps.psr
-\rm -r *.Reps.psl.tailer*
 \rm -r rec*
 
 ## clean up *.sample, *.fasta and *.fa files
-for indel in q t
+for indel in t_onQ t_sum
 do
 cd ${run_DIR}/${indel}
 \rm -r rec*
