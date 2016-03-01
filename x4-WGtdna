@@ -22,7 +22,7 @@ QUERYNAME=TDNA
 
 ##---------------------------------
 ## Blastn to find left-over T-DNA seq in the sample contigs
-\rm blastn.YB-on-TALEN_TDNA.table
+\rm blastn.${QUERYNAME}-on-YB.table
 for i in ${SAMPLE}
 do
 blastn -db ${prereq_DIR}/DB_${i}_contig -query ${prereq_DIR}/${QUERY} -evalue ${EVALUE} > blastn.${QUERYNAME}-on-${i}.aln
