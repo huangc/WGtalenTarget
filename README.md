@@ -15,7 +15,7 @@ Transcription activator-like effector nucleases (TALENs) is a genetic engineerin
 3. Generate and submit qsub script for whole genome blat alignment on Mason: `sh x1-WGblat`
 4. Submit qsub script for whole genome indel analysis on Mason: `qsub x2-WGindelT`
 5. Submit qsub script for TALE-NT2 target finder on Mason: `qsub x3-WGtalen`
-6. (optional) submit qsub script for finding TDNA left-over sequence on Mason: `qsub x4-WGtdna`  
+6. (Optional) submit qsub script for finding leftover TDNA vector sequence on Mason: `qsub x4-WGtdna`  
 7. Find main outputs in *data/*.
 8. Cleanup files with `sh xcleanup`
 
