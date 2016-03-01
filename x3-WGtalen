@@ -70,7 +70,7 @@ awk -v Rvd=${p} '{ FS="\t"; print $1,$6,$7,$8,$9,$10,$2,$3,$4,$5,Rvd }' | \
 tail -n+4 >> pairedtalesf.pTALENs-on-${REFSEQNAME}.txt
 done
 
-#3. Generate the join table that contain the "associated" pTALEN and indels, 
+#3. Generate the join table that contains the "associated" pTALEN and indels, 
 # where "associated" is defined as having their distance within ${PDEL} bp.
 # Join the tables by Tname(#1), tGapStart(#2), tGapSize(#3)
 #
