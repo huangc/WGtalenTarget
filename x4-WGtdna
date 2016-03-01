@@ -27,6 +27,7 @@ for i in ${SAMPLE}
 do
 blastn -db ${prereq_DIR}/DB_${i}_contig -query ${prereq_DIR}/${QUERY} -evalue ${EVALUE} > blastn.${QUERYNAME}-on-${i}.aln
 blastn -db ${prereq_DIR}/DB_${i}_contig -query ${prereq_DIR}/${QUERY} -evalue ${EVALUE} -outfmt 6 > blastn.${QUERYNAME}-on-${i}.table
+echo "blastn.${QUERYNAME}-on-${i}.table" >> blastn.${QUERYNAME}-on-YB.table
 cat blastn.${QUERYNAME}-on-${i}.table >> blastn.${QUERYNAME}-on-YB.table
 done
 
