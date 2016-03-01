@@ -8,7 +8,7 @@ Transcription activator-like effector nucleases (TALENs) is a genetic engineerin
 1. WG blat of sample contigs (by SOAP-denovo2 assembly) against reference.
 2. Make indel summary table for each deletion in sample contigs and filter for desired gap sizes.
 3. Find paired TALEN binding sites in each sample.
-4. Generate join table that contains the "associated" pTALEN and indels for each sample.
+4. Generate join table that contains the "associated" pTALEN and indels for each sample, where the association is defined by the desired distance (e.g. 10 bp) between pTALEN and indel.
 
 ## Workflow execution:
 1. Edit and setup the parameters as described in 0SOURCE, then `source 0SOURCE`
