@@ -21,7 +21,7 @@ QUERY=TALEN.fa
 QUERYNAME=TALEN
 
 ##---------------------------------
-## To find left-over T-DNA seq in the sample contigs using Blastn
+## Blastn to find left-over T-DNA seq in the sample contigs
 \rm blastn.YB-on-TALEN_TDNA.table
 for i in ${SAMPLE}
 do
