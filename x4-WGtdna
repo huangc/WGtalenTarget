@@ -29,8 +29,8 @@ blastn -db ${prereq_DIR}/DB_${i}_contig -query ${prereq_DIR}/${QUERY} -evalue ${
 blastn -db ${prereq_DIR}/DB_${i}_contig -query ${prereq_DIR}/${QUERY} -evalue ${EVALUE} -outfmt 6 > blastn.${QUERYNAME}-on-${i}.table
 cat blastn.${QUERYNAME}-on-${i}.table >> blastn.${QUERYNAME}-on-YB.table
 done
+
 echo "qseqid  sseqid  pident  length  mismatch gapopen qstart qend sstart send  evalue  bitscore" |\
 cat - blastn.${QUERYNAME}-on-YB.table > tmp && \mv tmp blastn.${QUERYNAME}-on-YB.table
-
 \cp blastn.${QUERYNAME}-on-YB.table ${data_DIR}
 
