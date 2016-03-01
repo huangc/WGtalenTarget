@@ -1,0 +1,104 @@
+#!/bin/bash
+#PBS -m abe
+#PBS -l nodes=1:ppn=20,vmem=40gb,walltime=4:00:00
+#PBS -N WGtdna
+#PBS -j oe
+
+## Aim: To check for the presence and location of the T-DNA sequences in the transgenic plant genomes.
+# Author: Chun-Yuan Huang, Ph.D.
+# Last Update: 2/29/2016
+
+
+## Ti Plasmid and T-DNA Design
+# TALEN.fa is the TALEN vector sequences, pTALEN-Os11N3-LR and pTALEN-8N3-LR, used in the TALEN mutagenesis project and provided by the BY lab in 9/16/2015.
+
+#1 pTALEN-Os11N3-LR features
+Hyg R
+T-DNA Left border: GTTTACACCACAATATATCCTGCCA
+Kanamycin R in bacteria
+T-DNA Right border: GTTTACCCGCCAATATATCCTGTCA
+Ubi1-TALEN-L
+CaMV 35S-TALEN-R
+
+#2 pTALEN-8N3-LR features
+Hyg R
+T-DNA Left border: GTTTACACCACAATATATCCTGCCA
+Kanamycin R in bacteria
+T-DNA Right border: GTTTACCCGCCAATATATCCTGTCA
+Ubi1-TALEN-L
+CaMV 35S-TALEN-R
+
+
+
+cd $PBS_O_WORKDIR
+source ./0SOURCE
+cd ${run_DIR}
+
+##---------------------------------
+## To find T-DNA seq in the scaffolds
+
+for i in ${SAMPLE}
+do
+cd ${WORK_DIR}/assembly/denovo/${i}
+ln -s ${TRegGA_DIR}/TALEN.fa .
+
+IN1=${i}-soap.contig
+OUT1=CONTIG
+QUERY=TALEN.fa
+QUERYNAME=TALEN
+makeblastdb -in ${IN1} -dbtype nucl -out ${OUT1} -parse_seqids
+blastn -db ${OUT1} -query ${QUERY} -evalue 1e-100 -outfmt 6 > blastn.${OUT1}.${QUERYNAME}.table
+blastn -db ${OUT1} -query ${QUERY} -evalue 1e-100 > blastn.${OUT1}.${QUERYNAME}
+
+IN2=${i}-soap.scafSeq
+OUT2=SCAFFOLD
+QUERY=TALEN.fa
+makeblastdb -in ${IN2} -dbtype nucl -out ${OUT2} -parse_seqids
+blastn -db ${OUT2} -query ${QUERY} -evalue 1e-100 -outfmt 6 > blastn.${OUT2}.${QUERYNAME}.table
+blastn -db ${OUT2} -query ${QUERY} -evalue 1e-100 > blastn.${OUT2}.${QUERYNAME}
+done
+
+## Results
+OUT2=SCAFFOLD
+QUERYNAME=TALEN
+
+for i in YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8
+do
+cd ${TRegGA_DIR}/assembly/denovo/${i}
+echo "
+${i} blastn.${OUT2}.${QUERYNAME}.table
+qseqid  sseqid  pident  length  mismatch        gapopen qstart  qend    sstart  send    evalue  bitscore
+" >> ${TRegGA_DIR}/blastn.TALEN.scaffolds.table
+cat ${TRegGA_DIR}/assembly/denovo/${i}/blastn.${OUT2}.${QUERYNAME}.table >> ${TRegGA_DIR}/blastn.TALEN.scaffolds.table
+done
+
+
+## Summary: the results show T-DNA sequences in the scaffolds of two, YB6 and YB7, of the eight samples
+# YB6 blastn.SCAFFOLD.TALEN.table
+qseqid  sseqid  pident  length  mismatch        gapopen qstart  qend    sstart  send    evalue  bitscore
+pTALEN-Os11N3-LR        scaffold14355   99.83   578     0       1       1813    2389    1013    1590    0.0      1061
+pTALEN-8N3-LR   scaffold14355   99.83   578     0       1       1813    2389    1013    1590    0.0      1061
+
+# YB7 blastn.SCAFFOLD.TALEN.table
+qseqid  sseqid  pident  length  mismatch        gapopen qstart  qend    sstart  send    evalue  bitscore
+pTALEN-Os11N3-LR        C1165250        99.84   640     0       1       8677    9315    2869    3508    0.0      1175
+pTALEN-Os11N3-LR        scaffold42640   99.82   546     1       0       15557   16102   546     1       0.0      1003
+pTALEN-Os11N3-LR        scaffold42640   99.82   546     1       0       10987   11532   546     1       0.0      1003
+pTALEN-Os11N3-LR        scaffold42640   99.81   523     0       1       9253    9774    2120    1598    0.0       959
+pTALEN-Os11N3-LR        scaffold42640   96.39   554     9       2       9911    10456   1436    886     0.0       902
+pTALEN-Os11N3-LR        scaffold42640   99.33   446     3       0       10460   10905   1107    662     0.0       808
+pTALEN-Os11N3-LR        C824655 96.78   373     12      0       16047   16419   441     69      1e-175    623
+pTALEN-Os11N3-LR        C824655 96.51   373     13      0       11477   11849   441     69      6e-174    617
+pTALEN-8N3-LR   C1165250        99.84   640     0       1       8677    9315    2869    3508    0.0      1175
+pTALEN-8N3-LR   scaffold42640   99.82   546     1       0       10987   11532   546     1       0.0      1003
+pTALEN-8N3-LR   scaffold42640   99.81   523     0       1       9253    9774    2120    1598    0.0       959
+pTALEN-8N3-LR   scaffold42640   96.39   554     9       2       9911    10456   1436    886     0.0       902
+pTALEN-8N3-LR   scaffold42640   99.33   446     3       0       10460   10905   1107    662     0.0       808
+pTALEN-8N3-LR   scaffold42640   99.76   424     1       0       16068   16491   546     123     0.0       778
+pTALEN-8N3-LR   C824655 97.88   377     8       0       11477   11853   441     65      0.0       652
+pTALEN-8N3-LR   C579362 100.00  214     0       0       17393   17606   214     1       3e-107    396
+pTALEN-8N3-LR   C579362 99.07   214     2       0       13375   13588   214     1       7e-104    385
+pTALEN-8N3-LR   C577220 99.07   214     0       2       12909   13121   213     1       2e-103    383
+pTALEN-8N3-LR   C577220 98.59   213     3       0       17233   17445   213     1       1e-101    377
+
+
