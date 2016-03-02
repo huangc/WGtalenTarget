@@ -128,7 +128,7 @@ qGapSize=`cut -d " " -f6 Trec`
 qGapEnd=`expr $qGapStart + $qGapSize`
 Samples=`cut -d " " -f7 Trec`
 
-if (( ${pTAL1Start} < ${tGapStart} && `expr ${tGapStart} - ${pTAL1Start}` < `expr ${PLEN} + ${PDEL}` )); then
+if (( ${pTAL1Start} < ${tGapStart} && `expr ${tGapStart} - ${pTAL2Start}` < ${PDEL} )); then
 	echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Samples} ${Qname} ${qGapStart} ${qGapSize} ${qGapEnd}\
  ${pTAL1Start} ${pSpacerLen} ${pTAL2Start} ${pTAL1Target} ${pTAL2Target}\
  ${pTAL1Rvd} ${pTAL2Rvd} ${pTAL1Score} ${pTAL2Score} ${pTALEN}" >> Seq.t_pTALENs-on-${REFSEQNAME}.out
