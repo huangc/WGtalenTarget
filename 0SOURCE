@@ -102,12 +102,10 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 # |----------------------------------blk1-----------------------------|   |--------blk2--------|   |-----blk3----|
 # Good candidate                                           |--rvdseq1--| |--rvdseq2--|
 # Bad candidate    |--rvdseq1--| |--rvdseq2--|
-#                  |<---------PLEN---------->||<---------PDEL-------->|
+#                                             |<---------PDEL-------->|
 
-## PLEN and PDEL are parameters to define the association between pTALEN site and deletion site.
+## PDEL is parameter to define the association between pTALEN site and deletion site.
 # Good candidate gap for pTALEN associated deletion would have small PDEL value.
-# PLEN: the estimated size (bp) of paired TALEN binding site from edge to edge and including the spacer.
-PLEN=70
 # PDEL: the distance (bp) from the near edge of pTALEN to the near edge of deletion site. 
 PDEL=10
 
