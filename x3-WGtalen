@@ -198,8 +198,8 @@ done
 #5. Report
 cd ${data_DIR}
 \cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.OUT .
-mkdir -p blat_at_pTALENdel
-\cp -s ${run_DIR}/blat_at_pTALENdel/*.pretty* blat_at_pTALENdel
+mkdir -p SeqDel_pTALENs-on-${REFSEQNAME}
+\cp -s ${run_DIR}/blat_at_pTALENdel/*.pretty* SeqDel_pTALENs-on-${REFSEQNAME}
 
 rename Seq.t SeqDel Seq.t*
 
