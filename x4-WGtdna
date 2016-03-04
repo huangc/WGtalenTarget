@@ -17,21 +17,32 @@ source ./0SOURCE
 cd ${run_DIR}
 mkdir -p tdna
 cd ${run_DIR}/tdna
-QUERY=TALEN.fa
-QUERYNAME=TDNA
+QUERY=${TDNA}
+QUERYNAME=${TDNANAME}
+SAMPLENAME=${SAMPLENAME}
 
 ##---------------------------------
-## Blastn to find left-over T-DNA seq in the sample contigs
-\rm blastn.${QUERYNAME}-on-YB.table
+#1. Blastn to find left-over T-DNA seq in the sample contigs
+\rm blastn.${QUERYNAME}-on-${SAMPLENAME}.table
 for i in ${SAMPLE}
 do
 blastn -db ${prereq_DIR}/DB_${i}_contig -query ${prereq_DIR}/${QUERY} -evalue ${EVALUE} > blastn.${QUERYNAME}-on-${i}.aln
 blastn -db ${prereq_DIR}/DB_${i}_contig -query ${prereq_DIR}/${QUERY} -evalue ${EVALUE} -outfmt 6 > blastn.${QUERYNAME}-on-${i}.table
-echo "blastn.${QUERYNAME}-on-${i}.table" >> blastn.${QUERYNAME}-on-YB.table
-cat blastn.${QUERYNAME}-on-${i}.table >> blastn.${QUERYNAME}-on-YB.table
+echo "blastn.${QUERYNAME}-on-${i}.table" >> blastn.${QUERYNAME}-on-${SAMPLENAME}.table
+if [[ -s blastn.${QUERYNAME}-on-${i}.table ]]; then
+cat blastn.${QUERYNAME}-on-${i}.table >> blastn.${QUERYNAME}-on-${SAMPLENAME}.table
+else
+echo "Blast has no result" >> blastn.${QUERYNAME}-on-${SAMPLENAME}.table
+fi
 done
 
 echo "qseqid  sseqid  pident  length  mismatch gapopen qstart qend sstart send  evalue  bitscore" |\
-cat - blastn.${QUERYNAME}-on-YB.table > tmp && \mv tmp blastn.${QUERYNAME}-on-YB.table
-\cp blastn.${QUERYNAME}-on-YB.table ${data_DIR}
+cat - blastn.${QUERYNAME}-on-${SAMPLENAME}.table > tmp && \mv tmp blastn.${QUERYNAME}-on-${SAMPLENAME}.table
+
+#2. Report
+\cp blastn.${QUERYNAME}-on-${SAMPLENAME}.table ${data_DIR}
+
+#-----
+#DONE
+#-----
 
