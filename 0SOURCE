@@ -23,6 +23,11 @@ REFGFF=OsjCHR.gff3
 # SAMPLE is a list of sample names. Each sample name should be only one word.
 SAMPLE="YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8"
 # SAMPLE="ZHENGSHAN97test ZHENGSHAN97test2"
+# SAMPLENAME is the collected sample name for reporting purpose, such as YB for all samples of YB1..YB8
+SAMPLENAME=YB
+# SAMPLENUM is the number of samples in this study
+SAMPLENUM=8
+
 # denovo_DIR is the directory that stores the denovo-assembled contigs.
 denovo_DIR=/N/dc2/projects/brendelgroup/TRegGA/TRegGA_v1/assembly/denovo
 # In order for the workflow to parse the contigs correctly, 
@@ -106,14 +111,19 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 
 ## PDEL is parameter to define the association between pTALEN site and deletion site.
 # Good candidate gap for pTALEN associated deletion would have small PDEL value.
-# PDEL: the distance (bp) from the near edge of pTALEN to the near edge of deletion site. 
+# PDEL: the distance (bp) from the near edge of pTALEN to the near edge of deletion site.
 PDEL=10
+# DELNUM is the estimated maximal number of deletions that can be covered within the length of pTALEN
+# pTALEN is 70-80 bp in average, including the spacer. Deletions are considered only for ${GAP_MINSIZE} (such as 5 bp) and up.
+# Thus you can have at most 16 deletions been covered by pTALEN.
+# For each pTALEN record, SAMPLENUM * DELNUM is the number of lines to be grepped for comparing with the pTALEN records.
+DELNUM=16
 
 ## Set the border size (bp) from gap for retrieving sequence for alignment
 GAP_BORDER=400
 
-## TDNA
+## TDNA blast search parameters
+# TDNA is the TDNA vector sequence used for pTALEN mutagenesis
 TDNA=TALEN.fa
 TDNANAME=TDNA
-SAMPLENAME=YB
 
