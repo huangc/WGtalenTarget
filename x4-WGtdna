@@ -9,7 +9,7 @@
 # Last Update: 3/01/2016
 
 ## Prerequisite files
-# TALEN.fa, the TALEN TDNA vector sequence that contains pTALEN-Os11N3-LR and pTALEN-8N3-LR for use in the TALEN mutagenesis.
+# TALEN.fa, the TALEN TDNA vector sequence used in the TALEN mutagenesis.
 # The SOAPdenovo2-assembled sample contigs ${i}-soap.contig and its indexed blastn database DB_${i}_contig.
 
 cd $PBS_O_WORKDIR
