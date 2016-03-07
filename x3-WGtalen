@@ -214,13 +214,16 @@ pslPretty -long blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl
 
 done
 
+
 #5. Report
 cd ${data_DIR}
 \cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.OUT .
 mkdir -p blat_at_pTALENdel
-\cp -s ${run_DIR}/blat_at_pTALENdel/*.pretty* blat_at_pTALENdel
+cd blat_at_pTALENdel
+\cp -s ../../run/blat_at_pTALENdel/*.pretty* .
 
 rename Seq.t SeqDel Seq.t*
+rename _onQ_ _ SeqDel_onQ_*
 
 #-----
 #DONE
