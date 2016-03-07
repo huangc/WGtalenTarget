@@ -3,30 +3,31 @@ source ./0SOURCE
 cd ${WORK_DIR}
 
 ## Clean up the qsub error message files
-mv *.o* scratch/
+mv *.o* ${scratch_DIR}
 
 ## Clean up the blat intermediate files
 cd ${run_DIR}
 \rm -r *.Reps.psr
 \rm -r rec*
 
-## clean up deletion table *.sample, *.fasta and *.fa files
+## Clean up deletion table *.sample, *.fasta and *.fa files
 for indel in t_onQ t_sum
 do
 cd ${run_DIR}/${indel}
 \rm -r rec*
-mkdir -p ${run_DIR}/${indel}/file_sample
-mv *.sample ${run_DIR}/${indel}/file_sample
+mkdir -p ${scratch_DIR}/${indel}/file_sample
+mv *.sample ${scratch_DIR}/${indel}/file_sample
 
-mkdir -p ${run_DIR}/${indel}/file_contig
-mv *.fa ${run_DIR}/${indel}/file_contig
+mkdir -p ${scratch_DIR}/${indel}/file_contig
+mv *.fa ${scratch_DIR}/${indel}/file_contig
 
-mkdir -p ${run_DIR}/${indel}/file_gap
-mv *_GAP_*.fasta ${run_DIR}/${indel}/file_gap
+mkdir -p ${scratch_DIR}/${indel}/file_gap
+mv *_GAP_*.fasta ${scratch_DIR}/${indel}/file_gap
+done
 
 ## clean up ptalen intermediate files
 cd ${run_DIR}/ptalen
-mkdir -p ${run_DIR}/ptalen/deletion
-mv Prec* ${run_DIR}/ptalen/deletion
+\rm -r Trec*
+mkdir -p ${scratch_DIR}/ptalen/deletion
+mv Prec* ${scratch_DIR}/ptalen/deletion
 
-done
