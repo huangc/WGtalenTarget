@@ -1,5 +1,6 @@
 ###  pTALEN target results that are in the genic plus upstream and downstrean 1,000 bp region: Tname_tGapStart_tGapSize_(Samples)
-* OsjChr3_7453387_84_(YB6) => LOC_Os03g13760, Small nuclear ribonucleoprotein family protein. The off-target site is located 368-439 bp downstream of the gene.
+* OsjChr3_7453387_84_(YB6) => LOC_Os03g13760, Small nuclear ribonucleoprotein family protein. 
+  The off-target site is located 368-439 bp downstream of the gene.
 * OsjChr4_20626111_120_(YB2;YB3;YB6;YB7;YB8) => LOC_Os04g34050, MAP kinase substrate 1. The off-target site is located 317-386 bp downstream of the gene.
 * OsjChr8_26728786_72_(YB2) => OsjSWEET11, Os8N3, Xa13, LOC_Os08g42350, Bidirectional sugar transporter. The target site is located at 29-85 bp upstream of the gene, at the promoter region.
 * OsjChr8_26728853_5_(YB3) => OsjSWEET11, Os8N3, Xa13, LOC_Os08g42350, Bidirectional sugar transporter. The target site is located at 29-85 bp upstream of the gene, at the promoter region.
