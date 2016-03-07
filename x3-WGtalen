@@ -218,6 +218,7 @@ done
 #5. Report
 cd ${data_DIR}
 \cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.OUT .
+\cp ${run_DIR}/ptalen/pairedtalesf.pTALENs-on-${REFSEQNAME}.txt .
 mkdir -p blat_at_pTALENdel
 cd blat_at_pTALENdel
 \cp -s ../../run/blat_at_pTALENdel/*.pretty* .
