@@ -1,7 +1,7 @@
 ### Description of YB samples
 * YB1 is a wildtype and the progenitor (grand parent) of YB2 to YB8 (grand kids), the parent of YB2 to YB8 was not sampled and sequenced.
 * The offspring of YB1 contains 5 bp deletion in SWEET14 and produced many seeds (embryos), from which a numnber of embryos were used for inoculation with TALEN_SWEET11. As a result, 7 embryos survived and became YB2 to YB8 at the same time during the second round of mutagenesis, then were sampled for sequencing.
-* 
+
 ### Q&A
 * Q: If YB2 and YB3 share a common transposition event, that is likely to have occurred in the progenitor cell that eventually produced YB2 and YB3.
 *  R: YB2 and YB3 or YB2 to YB8 all should share certain changes (including -5 bp deletion and a common transposition event) that occurred during the first mutagenesis cycle from YB1. However, the transposition, if any, and TALEN action on SWEET11 in the second round of mutagenesis should be independent.
