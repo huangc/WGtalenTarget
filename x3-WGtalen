@@ -1,3 +1,12 @@
+#!/bin/bash
+#PBS -m abe
+#PBS -l nodes=1:ppn=20,vmem=20gb,walltime=10:00:00
+#PBS -N WGtalen
+#PBS -j oe
+
+module add python
+module add blat
+
 # Aims: To investigate the Whole-Genome (WG) insertion/deletion (indel) profile of rice genomic samples under TALEN treatment.
 # Author: Chun-Yuan Huang, Ph.D.
 # Last Update: 3/4/2016
@@ -13,6 +22,7 @@
 #8. Extract the blat alignemnts (#4) according to the #7 iLoci hits for final inspection.
 
 
+cd $PBS_O_WORKDIR
 source ./0SOURCE
 cd ${run_DIR}
 
