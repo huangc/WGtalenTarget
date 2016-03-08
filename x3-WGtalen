@@ -234,7 +234,7 @@ cd ${data_DIR}
 \cp ${run_DIR}/ptalen/pairedtalesf.pTALENs-on-${REFSEQNAME}.txt .
 mkdir -p blat_at_pTALENdel
 cd blat_at_pTALENdel
-\cp -s ../../run/blat_at_pTALENdel/*.pretty* .
+\cp -r ${run_DIR}/blat_at_pTALENdel/*.pretty* .
 
 rename Seq.t SeqDel Seq.t*
 rename _onQ_ _ SeqDel_onQ_*
