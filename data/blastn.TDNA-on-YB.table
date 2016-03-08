@@ -1,0 +1,44 @@
+qseqid  sseqid  pident  length  mismatch gapopen qstart qend sstart send  evalue  bitscore
+--------------------------------------------------------------
+blastn.TDNA-on-YB1.table
+Blast has no result
+--------------------------------------------------------------
+blastn.TDNA-on-YB2.table
+Blast has no result
+--------------------------------------------------------------
+blastn.TDNA-on-YB3.table
+Blast has no result
+--------------------------------------------------------------
+blastn.TDNA-on-YB4.table
+Blast has no result
+--------------------------------------------------------------
+blastn.TDNA-on-YB5.table
+Blast has no result
+--------------------------------------------------------------
+blastn.TDNA-on-YB6.table
+Blast has no result
+--------------------------------------------------------------
+blastn.TDNA-on-YB7.table
+Ubi1-TALEN-L-pTALEN-Os11N3-LR	882409	99.83	586	0	1	346	930	1	586	0.0	 1075
+Ubi1-TALEN-L-pTALEN-Os11N3-LR	868905	99.82	546	1	0	2080	2625	1	546	0.0	 1003
+Ubi1-TALEN-L-pTALEN-Os11N3-LR	970049	95.57	587	6	10	1553	2120	334	919	0.0	  922
+Ubi1-TALEN-L-pTALEN-Os11N3-LR	970049	96.39	554	9	2	1004	1549	5	555	0.0	  902
+Ubi1-TALEN-L-pTALEN-Os11N3-LR	1165250	99.76	409	0	1	1	408	3100	3508	0.0	  749
+Ubi1-TALEN-L-pTALEN-Os11N3-LR	824655	96.51	373	13	0	2570	2942	441	69	2e-174	  617
+CaMV_35S-TALEN-R-pTALEN-Os11N3-LR	868905	99.82	546	1	0	940	1485	1	546	0.0	 1003
+CaMV_35S-TALEN-R-pTALEN-Os11N3-LR	824655	96.78	373	12	0	1430	1802	441	69	4e-176	  623
+Ubi1-TALEN-L-pTALEN-8N3-LR	882409	99.83	586	0	1	346	930	1	586	0.0	 1075
+Ubi1-TALEN-L-pTALEN-8N3-LR	868905	99.82	546	1	0	2080	2625	1	546	0.0	 1003
+Ubi1-TALEN-L-pTALEN-8N3-LR	970049	95.57	587	6	10	1553	2120	334	919	0.0	  922
+Ubi1-TALEN-L-pTALEN-8N3-LR	970049	96.39	554	9	2	1004	1549	5	555	0.0	  902
+Ubi1-TALEN-L-pTALEN-8N3-LR	1165250	99.76	409	0	1	1	408	3100	3508	0.0	  749
+Ubi1-TALEN-L-pTALEN-8N3-LR	824655	97.88	377	8	0	2570	2946	441	65	0.0	  652
+Ubi1-TALEN-L-pTALEN-8N3-LR	579362	99.07	214	2	0	4468	4681	214	1	2e-104	  385
+Ubi1-TALEN-L-pTALEN-8N3-LR	577220	99.07	214	0	2	4002	4214	213	1	7e-104	  383
+CaMV_35S-TALEN-R-pTALEN-8N3-LR	868905	99.82	546	1	0	940	1485	1	546	0.0	 1003
+CaMV_35S-TALEN-R-pTALEN-8N3-LR	824655	98.67	377	5	0	1430	1806	441	65	0.0	  669
+CaMV_35S-TALEN-R-pTALEN-8N3-LR	579362	100.00	214	0	0	3940	4153	214	1	9e-108	  396
+CaMV_35S-TALEN-R-pTALEN-8N3-LR	577220	98.59	213	3	0	3780	3992	213	1	3e-102	  377
+--------------------------------------------------------------
+blastn.TDNA-on-YB8.table
+Blast has no result
