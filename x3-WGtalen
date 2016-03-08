@@ -191,6 +191,9 @@ cd ${run_DIR}
 mkdir -p blat_at_pTALENdel
 cd blat_at_pTALENdel
 \cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.OUT .
+# Due to the possibility that the blat alignment between the retrieved gap region and contig could be too fragmented
+# as opposed to the whole genome blat, we recommend to use lower PERC_IDENTITY for the local blat.
+PERC_IDENTITY=95
 
 len=`awk 'END { print NR }' Seq.t_pTALENs-on-${REFSEQNAME}.OUT`
 for ((k=2; k<=$len; k++))
