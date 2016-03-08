@@ -69,9 +69,8 @@ GAP_MAXSIZE=5000 #Maximal gap size in bp, less than and including this number.
 
 ## qsub parameters for x1-WGblat job running on Mason 
 # The run time for whole genome blat of a typical 3kRGP rice cultivar contigs against reference rice Japonica
-# takes about 90-100 hrs on Mason. Plan carefully for submitting the job. 
-# WALLTIME=120
-WALLTIME=24
+# takes about 120 hrs on Mason. Plan carefully for submitting the job. 
+WALLTIME=120
 PPN=16
 VMEM=40
 
@@ -101,27 +100,23 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 ## Association of pTALEN and deletion sites
 # In the result of Blat analysis (psl file), the pairwise sequence alignments are described as connected blocks.
 # The gap between blocks are used here to infer the gap derived from pTALEN binding.
-# A pTALEN binding site and a deletion site is called associated if the pTALEN site is within 
-# ${PTALEN_INDEL} bp from the deletion site.
-
-# |----------------------------------blk1-----------------------------|   |--------blk2--------|   |-----blk3----|
-# Good candidate                                           |--rvdseq1--| |--rvdseq2--|
-# Bad candidate    |--rvdseq1--| |--rvdseq2--|
-#                                             |<---------PDEL-------->|
-
-## Now look into the deletion table to find the associated deletion sites
-# Sort and grep the lines before and after pTALEN record in the deletin table, 
-# which contain the potentially associated deletion sites.
+# A pTALEN binding site and a deletion site is called associated if the pTALEN site is within PDEL bp from the deletion site.
 
 # Cases for how pTALEN (marked ==) can be associated with the deletion. 
 # Sequence is marked -----, blanks are deletions, while the associated deletion is xxxxx.
 # RefSeq  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------| 
-# Case1                                  |==|
-# Case2                                            |==|
-# Case3                                                       |==|
-# Case1. pTAL1Start is before the associated deletion
-# Case2. pTAL1Start is inside the associated deletion
-# Case3. pTAL1Start is after the associated deletion
+# Case1            |==|<---------PDEL-------->|            |<---------PDEL---------->|==|
+# Case2                                  |==|
+# Case3                                            |==|
+# Case4                                                       |==|
+# Case1. PDEL is the distance in bp from the the closest edge of pTALEN to the deletion site.
+# Case2. pTAL1Start is before the associated deletion
+# Case3. pTAL1Start is inside the associated deletion
+# Case4. pTAL1Start is after the associated deletion
+## PDEL is parameter to define the association between pTALEN site and deletion site.
+# Good candidate gap for pTALEN associated deletion would have small PDEL value.
+# PDEL: the distance (bp) from the near edge of pTALEN to the near edge of deletion site.
+PDEL=10
 
 # Sample1  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------|
 # Sample2  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------|
@@ -132,6 +127,10 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 
 # RefSeq  |---------|       |-----------------------|x|-|xx|--|x|---------------|    |-------|
 # Scenario2 (pTALEN sized up)                      |===============|
+
+## Now look into the deletion table to find the associated deletion sites
+# Sort and grep the lines before and after pTALEN record in the deletin table, 
+# which contain the potentially associated deletion sites.
 
 # Note that in Scenario1 there could be deletions at the same position from multiple samples.
 # In Scenario2, potentially in the range of the pTALEN, about 70-80 bp in average, it may cover more than one deletions
@@ -151,11 +150,6 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 # OsjChr11 18183519 297 706663 290 0 YB7;
 # OsjChr11 18197060 50 792319 291 0 YB5;
 
-
-## PDEL is parameter to define the association between pTALEN site and deletion site.
-# Good candidate gap for pTALEN associated deletion would have small PDEL value.
-# PDEL: the distance (bp) from the near edge of pTALEN to the near edge of deletion site.
-PDEL=10
 # DELNUM is the estimated number of deletions that may be covered within the length of pTALEN
 # pTALEN is 70-80 bp in average, including the spacer. Deletions are at least GAP_MINSIZE.
 # Thus you can have at most 80/GAP_MINSIZE deletions been covered by pTALEN. Set DELNUM accordingly.
