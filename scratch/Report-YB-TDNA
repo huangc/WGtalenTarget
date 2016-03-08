@@ -1,8 +1,6 @@
-## Aims: To analyze rice genomic samples for potential and undesired [PthXo3 and AvrXa7] TAL effector nucleases (TALEN) off-target sites that were originally targeted at OsjSWEET11 (Os8N3) and OsjSWEET14 (Os11N3) promoter regions, respectively.
 ## Aim1: To check for the presence and location of the T-DNA sequences in the transgenic plant genomes. 
 ## Aim2: To validate the presence of TALEN mutagenesis at the targeted OsjSWEET11 (Os8N3) and OsjSWEET14 (Os11N3) promoter regions.
-## Aim3: To search for the presence and locations of TALEN mutagenesis at off-target site.
- 
+
 ## Sample description:
 # YB1: Oryze sative Japonica cv. Kitake, mock treatment (control)
 # YB2-YB8: transgenic Kitake plants with independent treatment for the TALEN-targeted mutagenesis at the OsSWEET11 and OsSWEET14 promoter regions. 
@@ -28,52 +26,11 @@ CaMV 35S-TALEN-R
 
 ## Methods:
 ## To process the Illumina reads from BY lab and perform rfguided assembly using the TRegGA workflow, follow with TALEN off-target sites discovery (method TBD).
-## To process the PacBio reads from BY lab and use it to improve the scaffolding of the Illumina reads at the rfguided stage.
 ## The approaches for the discovery of TALEN off-target sites could be a focused investigation at predicted off-target sites using softwares such as TALE-NT2 [1] or TALENoffer [2], followed with rfguided assembly; or could be a comprehensive investigation on whole-genome assembly of samples. 
 
 ##---------------------------------
 ## Aim1: To check for the presence and location of the T-DNA sequences in the transgenic plant genomes.
 #
-## To find T-DNA seq in the scaffolds
-
-TRegGA_DIR=/N/dc2/projects/brendelgroup/TRegGA/TRegGA_v1
-source ${TRegGA_DIR}/TRegGA.source
-
-for i in YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8
-do
-cd ${TRegGA_DIR}/assembly/denovo/${i}
-ln -s ${TRegGA_DIR}/TALEN.fa .
-
-IN1=${i}-soap.contig
-OUT1=CONTIG
-QUERY=TALEN.fa
-QUERYNAME=TALEN
-makeblastdb -in ${IN1} -dbtype nucl -out ${OUT1} -parse_seqids
-blastn -db ${OUT1} -query ${QUERY} -evalue 1e-100 -outfmt 6 > blastn.${OUT1}.${QUERYNAME}.table
-blastn -db ${OUT1} -query ${QUERY} -evalue 1e-100 > blastn.${OUT1}.${QUERYNAME}
-
-IN2=${i}-soap.scafSeq
-OUT2=SCAFFOLD
-QUERY=TALEN.fa
-makeblastdb -in ${IN2} -dbtype nucl -out ${OUT2} -parse_seqids
-blastn -db ${OUT2} -query ${QUERY} -evalue 1e-100 -outfmt 6 > blastn.${OUT2}.${QUERYNAME}.table
-blastn -db ${OUT2} -query ${QUERY} -evalue 1e-100 > blastn.${OUT2}.${QUERYNAME}
-done
-
-## Results
-OUT2=SCAFFOLD
-QUERYNAME=TALEN
-
-for i in YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8
-do
-cd ${TRegGA_DIR}/assembly/denovo/${i}
-echo "
-${i} blastn.${OUT2}.${QUERYNAME}.table
-qseqid	sseqid	pident	length	mismatch	gapopen	qstart	qend	sstart	send	evalue	bitscore
-" >> ${TRegGA_DIR}/blastn.TALEN.scaffolds.table
-cat ${TRegGA_DIR}/assembly/denovo/${i}/blastn.${OUT2}.${QUERYNAME}.table >> ${TRegGA_DIR}/blastn.TALEN.scaffolds.table
-done
-
 ## Summary: the results show T-DNA sequences in the scaffolds of two, YB6 and YB7, of the eight samples
 # YB6 blastn.SCAFFOLD.TALEN.table
 qseqid  sseqid  pident  length  mismatch        gapopen qstart  qend    sstart  send    evalue  bitscore
@@ -102,9 +59,6 @@ pTALEN-8N3-LR   C579362 99.07   214     2       0       13375   13588   214     
 pTALEN-8N3-LR   C577220 99.07   214     0       2       12909   13121   213     1       2e-103    383
 pTALEN-8N3-LR   C577220 98.59   213     3       0       17233   17445   213     1       1e-101    377
 
-
-## Search for the T-DNA integration site??
-
 ##----------------------------------------
 ## Aim2: To validate the presence of TALEN mutagenesis at the targeted OsjSWEET11 (Os8N3) and OsjSWEET14 (Os11N3) promoter regions.
 #
@@ -126,59 +80,8 @@ pTALEN-8N3-LR   C577220 98.59   213     3       0       17233   17445   213     
 # About this transcript: This transcript has 5 exons.
 # Take chr11:18,171,001-18,176,000 (5 Kb) as the target for TRegGA, which should include promoter region for the TALEN modification target site.
 
-## Sequence comparisons of the TRegGA assemblies between control and treatments at the OsjSWEET11 and OsjSWEET14 promoter regions
-TRegGA_DIR=/N/dc2/projects/brendelgroup/TRegGA/TRegGA_v1
-SAMPLE1=YB1
-
-for TARGET in OsjSWEET11 OsjSWEET14
-do
-cd ${TRegGA_DIR}/assembly/rfguided/${SAMPLE1}-on-${TARGET}/EVALUATION
-blastn -db TRGT -query ${SAMPLE1}-${TARGET}.fa -evalue 1e-100 > blastn.${TARGET}_vs_${SAMPLE1}-${TARGET}
-water -asequence ${TARGET}.fasta -bsequence ${SAMPLE1}-${TARGET}.fa -gapopen 10.0 -gapextend 0.1 -outfile water.${TARGET}_vs_${SAMPLE1}-${TARGET}
-
-for SAMPLE2 in YB2 YB3 YB4 YB5 YB6 YB7 YB8
-do
-cd ${TRegGA_DIR}/assembly/rfguided/${SAMPLE1}-on-${TARGET}/EVALUATION
-\cp ${TRegGA_DIR}/assembly/rfguided/${SAMPLE2}-on-${TARGET}/EVALUATION/${SAMPLE2}-${TARGET}.fa .
-blastn -db TRGT -query ${SAMPLE2}-${TARGET}.fa -evalue 1e-100 > blastn.${TARGET}_vs_${SAMPLE2}-${TARGET}
-water -asequence ${TARGET}.fasta -bsequence ${SAMPLE2}-${TARGET}.fa -gapopen 10.0 -gapextend 0.1 -outfile water.${TARGET}_vs_${SAMPLE2}-$\
-{TARGET}
-done
-done
-
 ## Show sequence comparison results
-
-TRegGA_DIR=/N/dc2/projects/brendelgroup/TRegGA/TRegGA_v1
-SAMPLE1=YB1
-
-for TARGET in OsjSWEET11 OsjSWEET14
-do
-cd ${TRegGA_DIR}/assembly/rfguided/${SAMPLE1}-on-${TARGET}/EVALUATION
-echo "
-
-blastn.${TARGET}_vs_${SAMPLE1}-${TARGET}
-" > blastn.${TARGET}_vs_SAMPLES-${TARGET}
-grep "Score =" blastn.${TARGET}_vs_${SAMPLE1}-${TARGET} >> blastn.${TARGET}_vs_SAMPLES-${TARGET}
-grep "Identities =" blastn.${TARGET}_vs_${SAMPLE1}-${TARGET} >> blastn.${TARGET}_vs_SAMPLES-${TARGET}
-grep -A 8 -B 5 "GTTTATATA" blastn.${TARGET}_vs_${SAMPLE1}-${TARGET} >> blastn.${TARGET}_vs_SAMPLES-${TARGET}
-
-for SAMPLE2 in YB2 YB3 YB4 YB5 YB6 YB7 YB8
-do
-echo "
-
-blastn.${TARGET}_vs_${SAMPLE2}-${TARGET}
-" >> blastn.${TARGET}_vs_SAMPLES-${TARGET}
-grep "Score =" blastn.${TARGET}_vs_${SAMPLE2}-${TARGET} >> blastn.${TARGET}_vs_SAMPLES-${TARGET}
-grep "Identities =" blastn.${TARGET}_vs_${SAMPLE2}-${TARGET} >> blastn.${TARGET}_vs_SAMPLES-${TARGET}
-#grep -A 6 -B 8 .-- blastn.${TARGET}_vs_${SAMPLE2}-${TARGET} >> blastn.${TARGET}_vs_SAMPLES-${TARGET}
-grep -A 8 -B 5 "GTTTATATA" blastn.${TARGET}_vs_${SAMPLE2}-${TARGET} >> blastn.${TARGET}_vs_SAMPLES-${TARGET}
-echo "
-" >> blastn.${TARGET}_vs_SAMPLES-${TARGET}
-done
-done
-
 ##-----------------------------------------------------------------------------
-## Summary
 # OsjSWEET11 and OsjSWEET14 are both on the reverse strand. 
 # The TATA box: TATAAA is marked with ^
 # The PthXo1 EBE: 5'GCATCTCCCCCTACTGTACACCAC (5'GTGGTGTACAGTAGGGGGAGATGC) is marked with 1 [3,4].
@@ -200,64 +103,6 @@ NI HG NI NI NS HD NN HD HD HD NS N* N* HD HD NS NS NN NN NI NG NN NI N* NS N*
 NI HG NI HG NI NI NI HD NN HD HD HD NG HD N* NI HD HD NN NS NI NN NN NG NN HD N* NS N*
 >PthXo1-24 (binds to Os8N3)
 NN HD NI HG HD NG N* HD HD NI NG NG NI HD NG NN NG NI NI NI NI N* NS N*
-
-
-##-----------------------------------------------------
-find . -name "talesfpaired.TALEN*.txt" -print -exec cat {} \; > talesfpaired-OsjSWEET.txt
-
-## talesfpaired.TALEN_LR_Os11N3-OsjSWEET14.txt
-RVD1 Best Possible Score:5.17
-RVD2 Best Possible Score:11.58
-Sequence Name   TAL 1   TAL 2   TAL 1 Score     TAL 2 Score     TAL 1 Start     TAL 2 Start     Spacer Length\
-   TAL 1 Target    TAL 2\
- Target
- OsjSWEET14.0    RVD2    RVD1    17.10   5.17    3462    3524    18      T GCTTGAAGGCTTGATGAGCTTAG       T CT\
-TCCTTCCTAGCACTATATAA
- OsjSWEET14.0    RVD2    RVD2    33.80   30.87   2182    2244    17      T ACTAGCAATGTTAATTGATAGGA       T AA\
-CTAAGATGTAGACAACCAATA
- OsjSWEET14.0    RVD2    RVD2    33.67   32.62   2769    2834    20      T GTATGTATATCTAATCTCCTCTA       T CT\
-TTTAGAACCAAACTAAAGATA
- OsjSWEET14.0    RVD2    RVD2    29.91   34.55   3102    3175    28      T GATTAAAAATGTAGAGAATAATA       T CC\
-AAGGAATTCTCTTGAGAATTA
- OsjSWEET14.0    RVD2    RVD2    33.44   34.53   4658    4723    20      T CATTCTAGCATTTCTCACATTCA       T GA\
-ATCTAGACATATATATCTATC
- OsjSWEET14.0    RVD2    RVD2    29.90   34.40   4723    4795    27      T CATTAAAATTAATATGAACTAGA       T TC\
-TTTTATGAGCAATAAATAGCA
-
-
-## talesfpaired.TALEN_LR_Os8N3-OsjSWEET14.txt
-RVD1 Best Possible Score:4.79
-RVD2 Best Possible Score:7.23
-Sequence Name   TAL 1   TAL 2   TAL 1 Score     TAL 2 Score     TAL 1 Start     TAL 2 Start     Spacer Length\
-   TAL 1 Target    TAL 2\
- Target
-
-
-## talesfpaired.TALEN_LR_Os8N3-OsjSWEET11.txt
-RVD1 Best Possible Score:4.79
-RVD2 Best Possible Score:7.23
-Sequence Name   TAL 1   TAL 2   TAL 1 Score     TAL 2 Score     TAL 1 Start     TAL 2 Start     Spacer Length\
-   TAL 1 Target    TAL 2\
- Target
- OsjSWEET11.0    RVD2    RVD1    7.23    6.79    3822    3878    17      T ATATAGTTGGAGACCCTCCACTT       T TA\
-GATATGCATCTCCCC
-
-
-## talesfpaired.TALEN_LR_Os11N3-OsjSWEET11.txt
-RVD1 Best Possible Score:5.17
-RVD2 Best Possible Score:11.58
-Sequence Name   TAL 1   TAL 2   TAL 1 Score     TAL 2 Score     TAL 1 Start     TAL 2 Start     Spacer Length\
-   TAL 1 Target    TAL 2\
- Target
- OsjSWEET11.0    RVD2    RVD2    33.28   34.59   1136    1196    15      T CACTCAAAGCTGACTGACTGACT       T AC\
-TTAAATTAATTATCTTGTTCA
- OsjSWEET11.0    RVD2    RVD2    32.72   33.41   2360    2427    22      T TCTTGTACACCTGCAAGAACGTC       T CT\
-CTGACGACGAACTGGAATTTA
- OsjSWEET11.0    RVD2    RVD2    32.28   33.39   4487    4559    27      T GTTCAAAAGAGAGAAAAAAAAGA       T GG\
-TACAACAGATGCTGATACAAA
- OsjSWEET11.0    RVD2    RVD2    32.08   33.71   4753    4816    18      T GCTTGTTAGATCGATCTTAATTA       T CC\
-ATAACTTCAGGAAAAGGTGAA
-
 
 ##-----------------------------------------------------
 
@@ -836,15 +681,6 @@ Sbjct  3574   ATGGTGTGTGACCCTGGACACCAATAGGCAATATAGCTGCACACACAAACTATTCCTGAT  3633
 
 
 ##-------------------------------------------
-
-
-
-
-##----------------------------
-# Discussion: the result indicates the YB8 PthXo3 EBE at OsjSWEET11 has a 11-bp deletion mutation caused by TALEN, which would inactivate binding of PthXo3 onto the OsjSWEET11 gene. 
-
-
-##----------------------------
 ## Reference
 
 [1] Doyle EL, Booher NJ, Standage DS, Voytas DF, Brendel VP, Vandyk JK, Bogdanove 
