@@ -30,4 +30,4 @@ Transcription activator-like effector nucleases (TALENs) is a genetic engineerin
 7. *doc/*: reference and tutorial documents.
 
 ## Notes: 
-1. The run time for whole genome blat of a typical 3kRGP rice cultivar contigs against reference rice Japonica takes about 90-100 hrs on Mason, so plan carefully for submitting the job `x1-WGblat`.
+1. The run time for whole genome blat of a typical 3kRGP rice cultivar contigs against reference rice Japonica takes about 120 hrs on Mason, so plan carefully for submitting the job `x1-WGblat`.
