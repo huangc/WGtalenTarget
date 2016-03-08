@@ -1,4 +1,4 @@
-### TALEN Mutagenesis for YB samples
+### TALEN mutagenesis and target site analysis for YB samples
 1.  BY1 is the wild type Kitaake which was used for introduction of TALEN construct targeting the promoter of SWEET14 (or Os11N3, a SWEET in chromosome 11) through tissue culture and transformation to get a stable mutant line. This line was one of many lines we got in the first round of mutagenesis with TALEN technology, and this line contained one 5-bp deletion in the promoter of SWEET14 and had the TALEN transgene segregated out (transgene free) as determined by PCR approach. 
 
 2.  Then this line was used for the second round of mutagenesis with another TALEN construct targeting the promoter of SWEET11 (or Os8N3, a SWEET in chromosome 8) again through tissue culture and transformation. As a result, seven independent lines of many transgenic lines that contained distinct base pair changes in the intended target site (promoter of SWEET11) were identified as TALEN transgene free again with PCR approach. 
