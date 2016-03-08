@@ -109,6 +109,49 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 # Bad candidate    |--rvdseq1--| |--rvdseq2--|
 #                                             |<---------PDEL-------->|
 
+## Now look into the deletion table to find the associated deletion sites
+# Sort and grep the lines before and after pTALEN record in the deletin table, 
+# which contain the potentially associated deletion sites.
+
+# Cases for how pTALEN (marked ==) can be associated with the deletion. 
+# Sequence is marked -----, blanks are deletions, while the associated deletion is xxxxx.
+# RefSeq  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------| 
+# Case1                                  |==|
+# Case2                                            |==|
+# Case3                                                       |==|
+# Case1. pTAL1Start is before the associated deletion
+# Case2. pTAL1Start is inside the associated deletion
+# Case3. pTAL1Start is after the associated deletion
+
+# Sample1  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------|
+# Sample2  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------|
+# Sample4  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------|
+# Sample5  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------|
+# Sample8  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------|
+# Scenario1                                  |==|
+
+# RefSeq  |---------|       |-----------------------|x|-|xx|--|x|---------------|    |-------|
+# Scenario2 (pTALEN sized up)                      |===============|
+
+# Note that in Scenario1 there could be deletions at the same position from multiple samples.
+# In Scenario2, potentially in the range of the pTALEN, about 70-80 bp in average, it may cover more than one deletions
+# To avoid these scenarios, grep larger region of lines by ${SAMPLENUM} * ${DELNUM} to compare with the pTALEN records
+# Below is an example of merged pTALEN and neighboring deletion sites for pTALEN_Os11N3
+# OsjChr11 18154472 12 973703 886 1 YB7;
+# OsjChr11 18155715 124 1185193 6 0 YB3;
+# OsjChr11 18159763 6 1185193 3930 0 YB3;
+# OsjChr11 18174463 18174525 19 TGCTTGAAGGCTTGATGAGCTTA TCTTCCTTCCTAGCACTATATAA RVD2 RVD1 9.09 5.17 pTALEN_Os11N3
+# OsjChr11 18174493 6 1093746 776 1 YB2;
+# OsjChr11 18174493 6 1158410 2799 1 YB6;
+# OsjChr11 18174493 6 1159256 1722 1 YB7;
+# OsjChr11 18174493 6 1168565 4308 1 YB5;
+# OsjChr11 18174493 6 1191711 4312 1 YB3;
+# OsjChr11 18174493 6 1245264 1719 1 YB4;
+# OsjChr11 18174493 6 1300843 1839 1 YB8;
+# OsjChr11 18183519 297 706663 290 0 YB7;
+# OsjChr11 18197060 50 792319 291 0 YB5;
+
+
 ## PDEL is parameter to define the association between pTALEN site and deletion site.
 # Good candidate gap for pTALEN associated deletion would have small PDEL value.
 # PDEL: the distance (bp) from the near edge of pTALEN to the near edge of deletion site.
