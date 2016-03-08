@@ -10,7 +10,7 @@
 * R: Yes, most likely.
 
 * Q: If an event is shared between YB2, YB3, YB4, and YB5, then we assume that this event happened even earlier, before the generation of the YB23 and YB45 progenitors.
-* R: should be like from John.
+* R: should be like from the offspring of YB1.
 
 * Q: How many cell divisions are there between the YB1 mother cell and the seed stage?  I thought a single plant produces hundreds of seeds.
 * R: Here is how the tissue culture and transformation works:
