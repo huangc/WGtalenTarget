@@ -56,11 +56,18 @@ NUM_THREADS=4
 # GAPOPEN=4
 # GAPEXTEND=1
 
-## blat
+## blat in x1-WGblat
 # Add blat directory to the PATH
 # export PATH=$PATH:${src_DIR}/blatSuite
 PERC_IDENTITY=99
 MIN_SCORE=250
+
+## blat in x3-WGtalen
+# The deletion site from reference sequence plus its surrounding GAP_BORDER size, defined in 0SOURCE, 
+# are retrieved for blat alignment with the full sample contig for reporting purpose. 
+# In the case where the deletion site is located near edge of the contig, its blat alignment result could be less than optimal or absent. 
+# Lower PERC_IDENTITY_RET value can increase the chance of reporting the less-optimal alignment.
+PERC_IDENTITY_RET=95
 
 ## filtering the blat indel results 
 GAP_MINNUM=1 #Minimal number of gaps, more than and including this number. Set to 1 for alignment with gaps only.
