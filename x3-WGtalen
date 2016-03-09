@@ -184,12 +184,6 @@ mkdir -p blat_at_pTALENdel
 cd blat_at_pTALENdel
 \cp ${run_DIR}/ptalen/Seq.t_pTALENs-on-${REFSEQNAME}.OUT .
 
-# Note that the deletion site from reference sequence plus its surrounding GAP_BORDER size, defined in 0SOURCE, 
-# are retrieved here for blat alignment with the full sample contig. 
-# In the case where the deletion site is located near edge of the contig, its blat alignment result could be 
-# less than optimal or absent. Modification of the PERC_IDENTITY to a lower value can remedy it.
-PERC_IDENTITY=95
-
 len=`awk 'END { print NR }' Seq.t_pTALENs-on-${REFSEQNAME}.OUT`
 for ((k=2; k<=$len; k++))
 do
@@ -210,7 +204,7 @@ sed -i "s/^>${Tname}/>${Samples}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${
 blastdbcmd -db ${prereq_DIR}/DB_${Samples}_contig -entry "lcl|${Qname}" -dbtype nucl -outfmt "%f" -out ${Samples}-${Qname}.fa
 sed -i -e "s/>lcl|/>/" ${Samples}-${Qname}.fa
 
-blat -t=dna -q=dna -out=psl -minIdentity=${PERC_IDENTITY} -minScore=${MIN_SCORE}\
+blat -t=dna -q=dna -out=psl -minIdentity=${PERC_IDENTITY_RET} -minScore=${MIN_SCORE}\
  ${Samples}-${Tname}_GapBorder${GAP_BORDER}_${tGapStart}_${tGapEnd}.fasta\
  ${Samples}-${Qname}.fa blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl
 pslPretty blat.${Samples}.${Qname}-on-${Tname}.${tGapStart}.${tGapEnd}.psl\
