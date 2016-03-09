@@ -100,21 +100,17 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 ## Association of pTALEN and deletion sites
 # In the result of Blat analysis (psl file), the pairwise sequence alignments are described as connected blocks.
 # The gap between blocks is used here to infer the gap derived from pTALEN binding and deletion.
-# A pTALEN binding site and a deletion site is called associated if the pTALEN site is within PDEL bp from the deletion site.
+# A pTALEN binding site and a deletion site is called associated if the pTALEN site is within PDEL bp from the deletion site,
+# where PDEL is the distance in bp from the near edge of pTALEN to the near edge of deletion site.
+# Smaller PDEL value infer stronger association of pTALEN binding and deletion, and better candidate for pTALEN target.
 # Cases for how pTALEN (marked ==) are associated with the deletion. 
 # Sequence is marked -----, blanks are deletions, while the associated deletion is xxxxx.
-# RefSeq  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------| 
-# Case1                       |==|<---PDEL--->|            |<---------PDEL---------->|==|
-# Case2                                  |==|
+# RefSeq  |---------|       |-----------------|xxxxxxxxxxxx|----------------------------| 
+# Case1                         |==|<--PDEL-->|           
+# Case2                                                    |<---------PDEL------->|==|
 # Case3                                            |==|
-# Case4                                                               |==|
-# Case1. PDEL is the distance in bp from the near edge of pTALEN to the near edge of deletion site.
-# Case2. pTAL1Start is before the associated deletion
-# Case3. pTAL1Start is inside the associated deletion
-# Case4. pTAL1Start is after the associated deletion
-# PDEL is parameter to define the association between pTALEN site and deletion site.
-# Smaller PDEL value infer stronger association of pTALEN binding and deletion, and better candidate for pTALEN target.
-# In turns of better pTALEN targets, Case3 > Case2 > Case4.
+# Case3. PDEL is not considered for target selection when the pTALEN is situated inside the deletion.
+# In turns of better pTALEN targets, Case3 > Case1 > Case2.
 PDEL=10
 
 ## Set the border size (bp) from gap for retrieving sequence for alignment
