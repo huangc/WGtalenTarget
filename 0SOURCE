@@ -99,7 +99,7 @@ PTALEN="pTALEN_Os11N3 pTALEN_Os8N3"
 
 ## Association of pTALEN and deletion sites
 # In the result of Blat analysis (psl file), the pairwise sequence alignments are described as connected blocks.
-# The gap between blocks is used here to infer the gap derived from pTALEN binding.
+# The gap between blocks is used here to infer the gap derived from pTALEN binding and deletion.
 # A pTALEN binding site and a deletion site is called associated if the pTALEN site is within PDEL bp from the deletion site.
 # Cases for how pTALEN (marked ==) can be associated with the deletion. 
 # Sequence is marked -----, blanks are deletions, while the associated deletion is xxxxx.
