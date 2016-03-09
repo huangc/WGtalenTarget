@@ -122,15 +122,15 @@ pTALEN=`cut -d " " -f11 Prec`
 # Sample8  |---------|       |-----------------|xxxxxxxxxxxx|-----------------|    |-------|
 # Scenario1                                  |==|
 
-# RefSeq  |-------------------------|x|-|xx|--|x|---------------|    |-------|
+# RefSeq   |-------------------------|x|-|xx|--|x|------------------|
 # Scenario2 (pTALEN sized up)     |===============|
 
-# Note that in Scenario1 there could be deletions at the same position from multiple samples.
-# In Scenario2, potentially in the range of the pTALEN, about 70-80 bp in average, it may cover more than one deletions
-# To consider these scenarios, grep larger region of lines by (SAMPLENUM x DELNUM) in order to compare with the pTALEN records,
-# where DELNUM is the estimated number of deletions that may be covered within the length of pTALEN
-# pTALEN is 70-80 bp in average, including the spacer. Deletions are at least GAP_MINSIZE.
-# Thus you can have at most 80/GAP_MINSIZE deletions been covered by pTALEN. Set DELNUM accordingly, but 5 should be more than enough.
+# In Scenario1, there are deletions at the same position from multiple samples.
+# In Scenario2, pTALEN, about 70-80 bp in average, may cover more than one deletions
+# To consider these scenarios, grep (SAMPLENUM x DELNUM) of neighboring deletion sites (lines) to compare with each pTALEN records,
+# where DELNUM is the number of deletions that may be covered within the length of pTALEN
+# pTALEN is 70-80 bp in average, including the spacer. Minimal deletion size is set by GAP_MINSIZE.
+# Set DELNUM accordingly, but 5 should be more than enough for most cases.
 DELNUM=5
 
 cat Prec Seq.t_Lg${GAP_MINSIZE}.table | grep -w "${Pname}" | sort -k2 -n |\
