@@ -66,7 +66,7 @@ MIN_SCORE=250
 # The deletion site from reference sequence plus its surrounding GAP_BORDER size, defined in 0SOURCE, 
 # are retrieved for blat alignment with the full sample contig for reporting purpose. 
 # In the case where the deletion site is located near edge of the contig, its blat alignment result could be less than optimal or absent. 
-# Lower PERC_IDENTITY_RET value to optimize the blat alignment if needed.
+# Lower PERC_IDENTITY_RET value to optimize the blat alignment, if needed.
 PERC_IDENTITY_RET=95
 
 ## filtering the blat indel results 
