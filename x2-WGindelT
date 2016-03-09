@@ -51,7 +51,7 @@ for i in ${SAMPLE}
 do
 QUERY=${i}-${SEQ}
 QUERYNAME=${i}.${SEQNAME}
-\rm blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap
+\rm -f blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap
 len=`awk 'END { print NR }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps`
 for ((k=1; k<=$len; k++))
 do
@@ -76,7 +76,7 @@ cut -d " " -f15 rec > rec.qStarts
 cut -d " " -f16 rec > rec.tStarts
 
 blockCount=`cat rec.blockCount`
-\rm rec.perGap
+\rm -f rec.perGap
 for ((m=1; m<$blockCount; m++))
 do
 blockSize=`cut -d"," -f $m rec.blockSizes`
@@ -159,7 +159,7 @@ do
 cd ${run_DIR}
 mkdir -p ${indel}
 cd ${indel}
-\rm -r *.sample
+\rm -fr *.sample
 for i in ${SAMPLE}
 do
 QUERY=${i}-${SEQ}
