@@ -37,7 +37,7 @@ cd ${run_DIR}
 #
 mkdir -p ptalen
 cd ptalen
-\rm pairedtalesf.sh
+\rm -f pairedtalesf.sh
 for p in ${PTALEN}
 do
 \cp -r ${prereq_DIR}/${p} .
@@ -62,7 +62,7 @@ sh pairedtalesf.sh
 # Change the TAL_Target such that "T TCCTGAAGAATTGATTCACTTC" becomes "TTCCTGAAGAATTGATTCACTTC"
 
 cd ${run_DIR}/ptalen
-\rm pairedtalesf.pTALENs-on-${REFSEQNAME}.txt
+\rm -f pairedtalesf.pTALENs-on-${REFSEQNAME}.txt
 for p in ${PTALEN}
 do
 sed -r 's/\bT\s/T/g' pairedtalesf.${p}-on-${REFSEQNAME}.txt | \
@@ -77,8 +77,8 @@ done
 cd ${run_DIR}/ptalen
 \cp ${run_DIR}/t_onQ/Seq.t_onQ_Lg${GAP_MINSIZE}.table Seq.t_Lg${GAP_MINSIZE}.table
 
-\rm Seq.t_pTALENs-on-${REFSEQNAME}.out
-\rm Seq.t_pTALENs-on-${REFSEQNAME}.err
+\rm -f Seq.t_pTALENs-on-${REFSEQNAME}.out
+\rm -f Seq.t_pTALENs-on-${REFSEQNAME}.err
 
 # First go through the list in the pTALEN binding site table
 row=`awk 'END { print NR }' pairedtalesf.pTALENs-on-${REFSEQNAME}.txt`
