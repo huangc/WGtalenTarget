@@ -7,14 +7,14 @@ mv *.o* ${scratch_DIR}
 
 ## Clean up the blat intermediate files
 cd ${run_DIR}
-\rm -r *.Reps.psr
-\rm -r rec*
+\rm -fr *.Reps.psr
+\rm -fr rec*
 
 ## Clean up deletion table *.sample, *.fasta and *.fa files
 for indel in t_onQ t_sum
 do
 cd ${run_DIR}/${indel}
-\rm -r rec*
+\rm -fr rec*
 mkdir -p ${scratch_DIR}/${indel}/file_sample
 mv *.sample ${scratch_DIR}/${indel}/file_sample
 
@@ -27,7 +27,7 @@ done
 
 ## clean up ptalen intermediate files
 cd ${run_DIR}/ptalen
-\rm -r Trec*
+\rm -fr Trec*
 mkdir -p ${scratch_DIR}/ptalen/deletion
 mv Prec* ${scratch_DIR}/ptalen/deletion
 
