@@ -23,7 +23,7 @@ SAMPLENAME=${SAMPLENAME}
 
 ##---------------------------------
 #1. Blastn to find left-over T-DNA seq in the sample contigs
-\rm blastn.${QUERYNAME}-on-${SAMPLENAME}.table
+\rm -f blastn.${QUERYNAME}-on-${SAMPLENAME}.table
 for i in ${SAMPLE}
 do
 blastn -db ${prereq_DIR}/DB_${i}_contig -query ${prereq_DIR}/${QUERY} -evalue ${EVALUE} > blastn.${QUERYNAME}-on-${i}.aln
