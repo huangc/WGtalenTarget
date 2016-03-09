@@ -130,8 +130,8 @@ pTALEN=`cut -d " " -f11 Prec`
 # To consider these scenarios, grep (SAMPLENUM x DELNUM) of neighboring deletion sites (lines) to compare with each pTALEN records,
 # where DELNUM is the number of deletions that may be covered within the length of pTALEN
 # pTALEN is 70-80 bp in average, including the spacer. Minimal deletion size is set by GAP_MINSIZE.
-# Set DELNUM accordingly, but 5 should be more than enough for most cases.
-DELNUM=5
+# Set DELNUM accordingly, but 4 should be more than enough for most cases.
+DELNUM=4
 
 cat Prec Seq.t_Lg${GAP_MINSIZE}.table | grep -w "${Pname}" | sort -k2 -n |\
  grep -B`expr ${SAMPLENUM} \* ${DELNUM}` -A`expr ${SAMPLENUM} \* ${DELNUM}` ${pTALEN} > Prec.${Pname}.${pTAL1Start}
