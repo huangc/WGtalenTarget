@@ -63,8 +63,8 @@ PERC_IDENTITY=99
 MIN_SCORE=250
 
 ## blat in x3-WGtalen
-# The deletion site from reference sequence plus its surrounding GAP_BORDER size, defined in 0SOURCE, 
-# are retrieved for blat alignment against sample contig for evaluation of the pTALEN target site. 
+# The deletion site from reference sequence plus its surrounding GAP_BORDER size are retrieved for 
+# blat alignment against sample contig for evaluation of the pTALEN target site. 
 # The blat alignment result could be less than optimal or absent depending on the deletion's site in contig or its size. 
 # Adjust PERC_IDENTITY_RET value to optimize the blat alignment, if needed.
 PERC_IDENTITY_RET=95
