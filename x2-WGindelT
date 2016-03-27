@@ -148,6 +148,7 @@ wait
 # The gaps due to deletions can be inferred from tGapSize of 1, 154, 7, 2 (none-zeros), sum up to 164 bp (TgapBases=164).
 
 ##-----------
+cd ${run_DIR}
 for i in ${SAMPLE}
 do
 QUERY=${i}-${SEQ}
