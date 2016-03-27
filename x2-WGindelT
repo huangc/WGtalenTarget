@@ -46,12 +46,19 @@ Q_size Q_start Q_end T_size T_start T_end block_count blockSizes qStarts tStarts
 cat - blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps > blat.${DB_REFSEQ}.${QUERYNAME}.psl.Gaps
 done
 
-# 
+# now generate psl.perGap records from each psl.gap record
+cd ${run_DIR}
 for i in ${SAMPLE}
 do
+echo "
+cd ${run_DIR}
+mkdir ${run_DIR}/$i
+cd ${run_DIR}/$i
+
 QUERY=${i}-${SEQ}
 QUERYNAME=${i}.${SEQNAME}
-\rm -f blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap
+ln -s ${run_DIR}/blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps .
+\rm blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap
 len=`awk 'END { print NR }' blat.${DB_REFSEQ}.${QUERYNAME}.psl.gaps`
 for ((k=1; k<=$len; k++))
 do
@@ -76,7 +83,7 @@ cut -d " " -f15 rec > rec.qStarts
 cut -d " " -f16 rec > rec.tStarts
 
 blockCount=`cat rec.blockCount`
-\rm -f rec.perGap
+\rm rec.perGap
 for ((m=1; m<$blockCount; m++))
 do
 blockSize=`cut -d"," -f $m rec.blockSizes`
@@ -116,7 +123,13 @@ done
 cat rec.perGap >> blat.${DB_REFSEQ}.${QUERYNAME}.psl.perGap
 
 done
+" > ${i}.perGap.sh
+sh ./${i}.perGap.sh
+
 done
+
+# wait until all psl.perGap processes are finished
+wait
 
 
 #4. Generate indel tables for insertion and deletion based on the filter of GAP_MINSIZE and GAP_MAXSIZE 
