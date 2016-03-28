@@ -21,7 +21,7 @@ REFSEQNAME=OsjCHR
 REFGFF=OsjCHR.gff3
 
 # SAMPLE is a list of sample names. Each sample name should be only one word.
-SAMPLE="YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8"
+SAMPLE="NIPPONBARE YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8"
 # SAMPLE="ZHENGSHAN97test ZHENGSHAN97test2"
 # SAMPLENAME is the collected sample name for reporting purpose, such as YB for all samples of YB1..YB8
 SAMPLENAME=YB
