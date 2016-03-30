@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo "## Aim: This is to investigate if NIPPONBARE is a closer relative to sample YB1 than to other YB samples.
+echo "## Aim: It was observed that YB1 has very distinct InDel pattern as compared to YB2-YB8, while YB2-YB8 s 
+This is to investigate if NIPPONBARE is a closer relative to sample YB1 than to other YB samples.
 # Proposition: Rice cultivars with similar InDel fingerprints are closer to each other.
 # Method: investigate the closeness of NIPPONBARE to samples YB1-YB8 with the shared deletion sites from SeqDel_sum_Lg5.table
 # SeqDel_sum_Lg5.table contains the deletion sites in size range 5-5,000 bp of samples YB1-YB8, as well as NIPPONBARE, 
