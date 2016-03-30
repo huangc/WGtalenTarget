@@ -9,7 +9,8 @@ echo "## Aim1: To demonstrate that YB1 has very distinct Deletion Fingerprints (
 # Samples: YB1, YB2, YB3, YB4, YB5, YB6, YB7, YB8
 # NIPPONBARE (cultivar CX140) is downloaded from 3kRGP.
 
-# [1] Deletion Fingerprints (DFP): deletions located in genic region (iloci) of assembled contigs.
+# [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome. 
+# To reduce the noise, we define DFP as the deletions that are located in the genic region (iloci).
 # [2] Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
 #----------------------------
 " > stat.result
