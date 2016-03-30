@@ -14,7 +14,7 @@ echo "## Aim1: To demonstrate that YB1 has very distinct InDel profile as compar
 
 # Redefine the minimal size of deletion gap for the purpose of InDel fingerprinting
 # which uses a longer gap size for robust comparison
-GAP_MINSIZE_FP=10
+GAP_MINSIZE_FP=100
 GAP_MAXSIZE_FP=5000
 
 # Refilter the deletion table according to the redefined GAP_MINSIZE.
