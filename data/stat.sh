@@ -2,13 +2,14 @@
 
 echo "## Aim1: To demonstrate that YB1 has very distinct InDel profile as compared to YB2-YB8, while YB2-YB8 share similar InDel profile. 
 # Aim2: To investigate whether NIPPONBARE (CX140) is a close relative to sample YB1 as compared to YB2-YB8 samples.
-# Proposition: Rice cultivars with similar InDel fingerprints are closer to each other.
-# Method: investigate the closeness of NIPPONBARE to samples YB1-YB8 with the shared deletion sites from SeqDel_sum_Lg5.table
-# SeqDel_sum_Lg5.table contains the deletion sites in size range 5-5,000 bp of samples YB1-YB8, as well as NIPPONBARE, 
+# Proposition: Rice cultivars with similar deletion fingerprints are closer to each other.
+# Deletion Fingerprints (DFP): deletions located in genic region (iloci) of assembled contigs.
+# Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
+# Method: Find and compare DFP among CX140, YB1-YB8.
+# SeqDel_sum_Lg5.table contains the deletion sites in size range 100-5,000 bp of samples YB1-YB8, as well as NIPPONBARE (CX140), 
 # as compared to the reference Nipponbare IRGSP-1.0.
 # Samples: YB1, YB2, YB3, YB4, YB5, YB6, YB7, YB8
-# NIPPONBARE is downloaded from 3kRGP, cultivar CX140.
-# Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
+# NIPPONBARE (cultivar CX140) is downloaded from 3kRGP.
 #----------------------------
 " > stat.result
 
