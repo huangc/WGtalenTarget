@@ -1,14 +1,15 @@
 ## Aim1: To demonstrate that YB1 has very distinct Deletion Fingerprints (DFP) [1] as compared to YB2-YB8, while YB2-YB8 share similar DFP.
-# Aim2: To investigate whether NIPPONBARE (CX140) is a close relative to sample YB1 as compared to YB2-YB8 samples.
+# Aim2: To investigate whether NIPPONBARE (CX140) is a close relative to sample YB1 as compared to YB2-YB8.
 # Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to each other in phylogeny.
 # Method: Find DFP of CX140, YB1-YB8, then evaluate the proportion of shared deletion sites among them.
-# SeqDel_sum_Lg20.gILOCI contains the deletion sites in genic region size range 20-5,000 bp of samples YB1-YB8, as well as NIPPONBARE (CX140),
-# as compared to the reference Nipponbare IRGSP-1.0.
+# SeqDel_sum_Lg20.gILOCI contains the deletion sites in genic region size range 20-5,000 bp of samples YB1-YB8, as well as 
+# NIPPONBARE (CX140), as compared to the reference Nipponbare IRGSP-1.0.
 # Samples: YB1, YB2, YB3, YB4, YB5, YB6, YB7, YB8
 # NIPPONBARE (cultivar CX140) is downloaded from 3kRGP.
 
 # [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome.
-#     To reduce the noise, we define DFP as the deletions that are located in the genic region (plus up- and downstream 1000 bp).
+#     To reduce the artifects from sequencing error, assembly error, repetitive sequence, 
+#     we define DFP as the deletions of larger than 20 bp and located in the genic region (plus up- and downstream 1000 bp).
 # [2] Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
 #----------------------------
 
@@ -53,10 +54,10 @@ Percentage of deletion sites that are shared by YB8 and CX140 as compared to del
 #-------------------------
 ## Conclusion:
 #1. The NIPPONBARE (CX140) from 3kRGP has already accumulated 241 deletions as compared to the reference of its own.
-#2. Using deletion sites as fingerprinting marker, NIPPONBARE shared similar number of deletions (46-53, average 50)
+#2. Using deletion sites as fingerprinting marker, CX140 shared similar number of deletions (46-53, average 50)
 #   with individual sample.
 #3. There are 2.3 folds more deletions in YB2-YB8 than in YB1, as compared to the reference Nipponbare.
 #4. YB1 has higher percentage (5.6%) of Nipponbare-shared deletion sites than other YB samples (~2.8%), so it is likely 
-#   that YB1 is a cultivar closer to NIPPONBARE than YB2-YB8 are to NIPPONBARE.
+#   that YB1 is a cultivar closer to Cx140 than YB2-YB8 are to CX140.
 #5. The Indel fingerprinting result is consistent with the SNP fingerprinting result, which shows strong evidence that
-#   NIPPONBARE is the closest relative among all 3kRGP to YB1.
+#   CX140 is the closest relative among all 3kRGP to YB1.
