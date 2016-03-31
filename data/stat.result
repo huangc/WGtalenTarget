@@ -1,61 +1,63 @@
-## Aim: This is to investigate if NIPPONBARE is a closer relative to sample YB1 than to other YB samples.
-# Proposition: Rice cultivars with similar InDel fingerprints are closer to each other.
-# Method: investigate the closeness of NIPPONBARE to samples YB1-YB8 with the shared deletion sites from SeqDel_sum_Lg5.table
-# SeqDel_sum_Lg5.table contains the deletion sites in size range 5-5,000 bp of samples YB1-YB8, as well as NIPPONBARE, 
+## Aim1: To demonstrate that YB1 has very distinct Deletion Fingerprints (DFP) [1] as compared to YB2-YB8, while YB2-YB8 share similar DFP.
+# Aim2: To investigate whether NIPPONBARE (CX140) is a close relative to sample YB1 as compared to YB2-YB8 samples.
+# Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to each other in phylogeny.
+# Method: Find DFP of CX140, YB1-YB8, then evaluate the proportion of shared deletion sites among them.
+# SeqDel_sum_Lg5.table contains the deletion sites in size range 100-5,000 bp of samples YB1-YB8, as well as NIPPONBARE (CX140),
 # as compared to the reference Nipponbare IRGSP-1.0.
 # Samples: YB1, YB2, YB3, YB4, YB5, YB6, YB7, YB8
-# NIPPONBARE is downloaded from 3kRGP, cultivar CX140.
-# Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
+# NIPPONBARE (cultivar CX140) is downloaded from 3kRGP.
+
+# [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome.
+# To reduce the noise, we define DFP as the deletions that are located in the genic region (iloci).
+# [2] Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
 #----------------------------
 
-Total deletion sites from NIPPONBARE and samples YB1-YB8 are 19232
-Total deletion sites from NIPPONBARE are 694
-Total deletion sites from samples YB1-YB8 are 18833
-Total deletion sites that are shared among NIPPONBARE and samples YB1-YB8 are 80
+Total deletion sites in Seq.t_sum_Lg20.gILOCI are 8549
+Total deletion sites from CX140 are 241
+Total deletion sites from YB samples are 8390
+Total deletion sites that are shared among CX140 and YB samples are 16
 
-
-Total deletion sites from sample YB1 are 1859
-Total deletion sites from NIPPONBARE that are also shared with sample YB1 are 187
-Percentage of Nipponbare deletion sites that are shared with YB1 as compared to deletions of sample YB1 is 10.0592%
-
-Total deletion sites from sample YB2 are 5042
-Total deletion sites from NIPPONBARE that are also shared with sample YB2 are 199
-Percentage of Nipponbare deletion sites that are shared with YB2 as compared to deletions of sample YB2 is 3.94685%
-
-Total deletion sites from sample YB3 are 5244
-Total deletion sites from NIPPONBARE that are also shared with sample YB3 are 212
-Percentage of Nipponbare deletion sites that are shared with YB3 as compared to deletions of sample YB3 is 4.04272%
-
-Total deletion sites from sample YB4 are 5286
-Total deletion sites from NIPPONBARE that are also shared with sample YB4 are 211
-Percentage of Nipponbare deletion sites that are shared with YB4 as compared to deletions of sample YB4 is 3.99168%
-
-Total deletion sites from sample YB5 are 5430
-Total deletion sites from NIPPONBARE that are also shared with sample YB5 are 209
-Percentage of Nipponbare deletion sites that are shared with YB5 as compared to deletions of sample YB5 is 3.84899%
-
-Total deletion sites from sample YB6 are 5429
-Total deletion sites from NIPPONBARE that are also shared with sample YB6 are 194
-Percentage of Nipponbare deletion sites that are shared with YB6 as compared to deletions of sample YB6 is 3.5734%
-
-Total deletion sites from sample YB7 are 5357
-Total deletion sites from NIPPONBARE that are also shared with sample YB7 are 210
-Percentage of Nipponbare deletion sites that are shared with YB7 as compared to deletions of sample YB7 is 3.9201%
-
-Total deletion sites from sample YB8 are 5423
-Total deletion sites from NIPPONBARE that are also shared with sample YB8 are 189
-Percentage of Nipponbare deletion sites that are shared with YB8 as compared to deletions of sample YB8 is 3.48516%
+##
+Total deletion sites from sample YB1 are 825
+Total deletion sites from sample YB1 that are also shared with CX140 are 46
+Percentage of deletion sites that are shared by YB1 and CX140 as compared to deletion sites of sample YB1 is 5.57576%
+##
+Total deletion sites from sample YB2 are 1644
+Total deletion sites from sample YB2 that are also shared with CX140 are 49
+Percentage of deletion sites that are shared by YB2 and CX140 as compared to deletion sites of sample YB2 is 2.98054%
+##
+Total deletion sites from sample YB3 are 1815
+Total deletion sites from sample YB3 that are also shared with CX140 are 56
+Percentage of deletion sites that are shared by YB3 and CX140 as compared to deletion sites of sample YB3 is 3.0854%
+##
+Total deletion sites from sample YB4 are 1842
+Total deletion sites from sample YB4 that are also shared with CX140 are 52
+Percentage of deletion sites that are shared by YB4 and CX140 as compared to deletion sites of sample YB4 is 2.82302%
+##
+Total deletion sites from sample YB5 are 1946
+Total deletion sites from sample YB5 that are also shared with CX140 are 53
+Percentage of deletion sites that are shared by YB5 and CX140 as compared to deletion sites of sample YB5 is 2.72354%
+##
+Total deletion sites from sample YB6 are 1931
+Total deletion sites from sample YB6 that are also shared with CX140 are 53
+Percentage of deletion sites that are shared by YB6 and CX140 as compared to deletion sites of sample YB6 is 2.74469%
+##
+Total deletion sites from sample YB7 are 1912
+Total deletion sites from sample YB7 that are also shared with CX140 are 52
+Percentage of deletion sites that are shared by YB7 and CX140 as compared to deletion sites of sample YB7 is 2.71967%
+##
+Total deletion sites from sample YB8 are 1948
+Total deletion sites from sample YB8 that are also shared with CX140 are 53
+Percentage of deletion sites that are shared by YB8 and CX140 as compared to deletion sites of sample YB8 is 2.72074%
 
 
 #-------------------------
-## Conclusion: 
+## Conclusion:
 #1. The NIPPONBARE (CX140) from 3kRGP has already accumulated 694 deletions as compared to the reference of its own.
-#2. Using deletion sites as fingerprinting marker, NIPPONBARE shared similar number of deletions (187-212, average 201) 
-#   with individual sample. Among them, 80 deletions sites are shared for NIPPONBARE and all YB1-YB8. 
+#2. Using deletion sites as fingerprinting marker, NIPPONBARE shared similar number of deletions (187-212, average 201)
+#   with individual sample. Among them, 80 deletions sites are shared for NIPPONBARE and all YB1-YB8.
 #3. There are 2.86 folds more deletions in YB2-YB8 than in YB1, as compared to the reference Nipponbare.
 #4. YB1 has higher percentage (10%) of Nipponbare-shared deletion sites than other YB samples (~3.8%).
 #5. It is likely that YB1 is a cultivar closer to NIPPONBARE than YB2-YB8 are to NIPPONBARE, based on the observations #3 and #4.
-#6. The Indel fingerprinting result is consistent with the SNP fingerprinting result, which shows strong evidence that 
-#   NIPPONBARE is the closest relative among all 3kRGP to YB1. 
-
-
+#6. The Indel fingerprinting result is consistent with the SNP fingerprinting result, which shows strong evidence that
+#   NIPPONBARE is the closest relative among all 3kRGP to YB1.
