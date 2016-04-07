@@ -121,7 +121,7 @@ done
 cd ${run_DIR}
 for i in ${SAMPLE}
 do
-sh x2-WGindelT-perGap-${i}
+sh x2-WGindelT-perGap-${i} &
 done
 
 # Wait for all jobs to finish
