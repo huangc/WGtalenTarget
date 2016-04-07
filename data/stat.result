@@ -1,5 +1,5 @@
 ## Aim1: To demonstrate that YB1 has very distinct Deletion Fingerprints (DFP) [1] as compared to YB2-YB8, while YB2-YB8 share similar DFP.
-# Aim2: To investigate whether NIPPONBARE (CX140) is a close relative to sample YB1 as compared to YB2-YB8.
+## Aim2: To investigate whether NIPPONBARE (CX140) is a close relative to sample YB1 as compared to YB2-YB8.
 # Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to each other in phylogeny.
 # Method: Find DFP of CX140, YB1-YB8, then evaluate the proportion of shared deletion sites among them.
 # SeqDel_sum_Lg20.gILOCI contains the deletion sites in genic region size range 20-5,000 bp of samples YB1-YB8, as well as 
