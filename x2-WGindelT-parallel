@@ -124,7 +124,7 @@ do
 sh x2-WGindelT-perGap-${i} &
 done
 
-# Wait for all jobs to finish
+# Wait for all jobs are finished
 wait
 
 ##-----------
