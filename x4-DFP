@@ -1,0 +1,176 @@
+#!/bin/bash
+#PBS -m abe
+#PBS -l nodes=1:ppn=20,vmem=20gb,walltime=10:00:00
+#PBS -N x4-DFP
+#PBS -j oe
+
+module add python
+
+## Aim1: To demonstrate that YB1 has very distinct Deletion Fingerprints (DFP) [1] as compared to YB2-YB8, while YB2-YB8 share similar DFP. 
+# Aim2: To investigate whether NIPPONBARE (CX140) is a close relative to sample YB1 as compared to YB2-YB8 samples.
+# Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to each other in phylogeny.
+# Method: Find DFP of CX140, YB1-YB8, then evaluate the proportion of shared deletion sites among them.
+# SeqDel_sum_Lg5.table contains the deletion sites in size range 100-5,000 bp of samples YB1-YB8, as well as NIPPONBARE (CX140), 
+# as compared to the reference Nipponbare IRGSP-1.0.
+# Samples: YB1, YB2, YB3, YB4, YB5, YB6, YB7, YB8
+# NIPPONBARE (cultivar CX140) is downloaded from 3kRGP.
+
+# [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome. 
+#     To reduce the noise, we define DFP as the deletions that are located in the genic region (iloci).
+# [2] Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
+#----------------------------
+
+# Redefine the minimal size of deletion gap for the purpose of InDel fingerprinting
+# which uses a longer gap size for robust comparison
+GAP_MINSIZE_FP=5
+GAP_MAXSIZE_FP=5000
+
+# Setup for comparison
+QUERY=NIPPONBARE
+QUERYNAME=CX140
+SAMPLE="YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8"
+SAMPLENAME=YB
+
+# Setup for iLocus
+LOCUSPOCUS_DIR=/home/huangcy/src/AEGEAN/AEGeAn/bin
+XTRACTORE_DIR=/home/huangcy/src/AEGEAN/AEGeAn/bin
+ILOCUSSEQ=OsjLOCUS.fa
+ILOCUSGFF=OsjLOCUS.gff3
+ILOCUSNAME=OsjLOCUS
+DELTA=1000
+ILOCUSSEQ_PTALEN=OsjpTALEN.fa
+DB_ILOCUS=OsjLOCUS
+
+
+# Retrieve the rice Japonica gff3 file. Note the gff3 from Plant Ensembl has non-canonical features, and should use the gff3 from MSU instead.
+cd ${prereq_DIR}
+wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/all.dir/all.gff3
+# wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/all.dir/all.chrs.con
+\mv all.gff3 ${REFGFF}
+# mv all.chrs.con ${REFSEQ}
+# wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/chr11.dir/Chr11.gff3
+# wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/chr11.dir/Chr11.con
+# mv Chr11.gff3 OsjCHR11.gff3
+# mv Chr11.con OsjCHR11.fa
+# change the Chr name from Chr to OsjChr to match with OsjCHR.fa
+sed -i 's/Chr/OsjChr/g' ${REFGFF} 
+
+
+##----------------------------
+cd $PBS_O_WORKDIR
+source ./0SOURCE
+cd ${run_DIR}
+
+#-----
+#1. Generate iLOCUS for the genic regions plus 1kb up- and downstram regions of the reference genome.
+#
+mkdir -p iloci
+cd iloci
+
+ln -s ${prereq_DIR}/${REFGFF} .
+/home/huangcy/src/AEGEAN/AEGeAn/bin/locuspocus --delta ${DELTA} --cds --verbose --genemap ${ILOCUSNAME}.genemap --retainids --skipiiloci --outfile ${ILOCUSGFF} ${REFGFF}
+/home/huangcy/src/AEGEAN/AEGeAn/bin/xtractore --type=locus ${ILOCUSGFF} ${prereq_DIR}/${REFSEQ} > ${ILOCUSSEQ}
+makeblastdb -in ${ILOCUSSEQ} -dbtype nucl -out ${DB_ILOCUS} -parse_seqids
+# sort -k 2,2 ${ILOCUSNAME}.genemap > tmp && \mv tmp ${ILOCUSNAME}.genemap
+
+#1. First extract the iloci records from ILOCUSGFF (OsjLOCUS.gff3)
+# QsjChr1 AEGeAn::LocusPocus      locus   2903    11817   .       .       .       ID=locus1;Name=locus1;gene=1;mRNA=2;right_overlap=1600;iiLocus_exception=delta-overlap-gene;riil=0;effective_length=7315;iLocus_type=piLocus
+# OsjChr1 AEGeAn::LocusPocus      locus   10218   13435   .       .       .       ID=locus2;left_overlap=1600;liil=0;Name=locus2;gene=1;mRNA=1;right_overlap=1788;iiLocus_exception=delta-overlap-gene;riil=0;effective_length=1430;iLocus_type=piLocus
+
+grep "LocusPocus" ${ILOCUSGFF} > iLOCI.gff3
+awk '{ print $1,$4,$5,$9 }' iLOCI.gff3 | sed 's/;/ /g' | awk '{ print $1,$2,$3,$4 }' |\
+ sed 's/ID=//g' > iLOCI.table
+## Example of iLOCI.table
+# OsjChr1 2903 11817 locus1
+# OsjChr1 10218 13435 locus2
+
+## Re-filter the deletion table according to the redefined GAP_MINSIZE.
+# Tname tGapStart tGapSize Samples
+# OsjChr10 10744678 358 YB3;
+# OsjChr10 10766127 121 NIPPONBARE;YB2;YB3;YB4;YB5;YB6;YB7;YB8;
+# OsjChr10 10790085 131 NIPPONBARE;YB2;YB3;YB5;YB7;YB8;
+# OsjChr10 10808634 306 YB4;
+# OsjChr10 10844270 366 YB2;YB6;YB7;YB8;
+
+ln -s ${run_DIR}/t_sum/Seq.t_sum_Lg${GAP_MINSIZE}.table .
+awk -v gap_minsize="${GAP_MINSIZE_FP}" -v gap_maxsize="${GAP_MAXSIZE_FP}" '{ OFS="\t"; if ( $3 >= gap_minsize && $3 <= gap_maxsize ) print $0 }' \
+ Seq.t_sum_Lg${GAP_MINSIZE}.table > Seq.t_sum_Lg${GAP_MINSIZE_FP}.table
+
+
+#2. Filter the deletion table based on overlapping iloci by
+# removing the deletion records that are located entirely in the intergenic region (between iloci with no overlapping) 
+# step1: merge each deletion record with iLOCI.table. 
+# step2: Sort and grep the lines before and after ilocus record in the deletion table, 
+#        which contain the potentially overlapping deletion sites.
+# step3: grep the neighboring iloci before and after the deletion record
+# step4: if delStart > beforeLocusEnd && delEnd < afterLocusStart, write this to iiLOCUS.del
+#        else if delStart < beforeLocusEnd, write the beforeLocusName and deletion record to iLOCUS.del
+#        else if delEnd > afterLocusStart, write the afterLocusName and deletion record to iLOCUS.del
+
+# Below is an example of merged iLOCI.table and neighboring deletion sites
+# OsjChr10 5779856 5790347 locus7372
+# OsjChr10 5789870 246 YB1;YB5;YB6;YB7;YB8;
+# OsjChr10 5793555 5796914 locus7373
+
+\rm Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci
+\rm Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI
+row=`awk 'END { print NR }' Seq.t_sum_Lg${GAP_MINSIZE_FP}.table`
+for ((m=1; m<=$row; m++))
+do
+head -$m Seq.t_sum_Lg${GAP_MINSIZE_FP}.table | tail -1 > delrec
+Tname=`cut -d " " -f1 delrec`
+tGapStart=`cut -d " " -f2 delrec`
+tGapSize=`cut -d " " -f3 delrec`
+tGapEnd=`expr $tGapStart + $tGapSize`
+Samples=`cut -d " " -f4 delrec`
+
+cat delrec iLOCI.table | grep -w "${Tname}" | sort -k2 -n |\
+ grep -B1 -A1 ${Samples} > delrec.${Tname}.${tGapStart}
+
+grep -v "${Samples}" delrec.${Tname}.${tGapStart} > delrec.${Tname}.${tGapStart}.iloci
+\rm beforeLocus
+\rm afterLocus
+len=`awk 'END { print NR }' delrec.${Tname}.${tGapStart}.iloci`
+for ((p=1; p<=$len; p++))
+do
+head -$p delrec.${Tname}.${tGapStart}.iloci | tail -1 > iloc
+Tname=`cut -d " " -f1 iloc`
+locusStart=`cut -d " " -f2 iloc`
+locusEnd=`cut -d " " -f3 iloc`
+locusID=`cut -d " " -f4 iloc`
+if (( ${locusStart} <= ${tGapStart} )); then
+    cat iloc > beforeLocus
+else
+    cat iloc > afterLocus
+fi
+done
+
+beforeLocusStart=`cut -d " " -f2 beforeLocus`
+beforeLocusEnd=`cut -d " " -f3 beforeLocus`
+beforeLocusID=`cut -d " " -f4 beforeLocus`
+afterLocusStart=`cut -d " " -f2 afterLocus`
+afterLocusEnd=`cut -d " " -f3 afterLocus`
+afterLocusID=`cut -d " " -f4 afterLocus`
+
+# step4: if gapStart > beforeLocusEnd && gapEnd < afterLocusStart, write this to iiLOCUS.del
+#        else if gapStart < beforeLocusEnd, write the beforeLocusID and delrec to iLOCUS.del
+#        else if gapEnd > afterLocusStart, write the afterLocusID and delrec to iLOCUS.del
+
+if (( ${tGapStart} >= ${beforeLocusEnd} && ${tGapEnd} <= ${afterLocusStart} )); then
+    echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Samples} intergenic" >> Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci
+elif (( ${tGapStart} < ${beforeLocusEnd} )); then
+    echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Samples} ${beforeLocusID}" >> Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci
+elif (( ${tGapEnd} > ${afterLocusStart} )); then
+    echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Samples} ${afterLocusID}" >> Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci
+else
+    echo "${Tname} ${tGapStart} ${tGapSize} ${tGapEnd} ${Samples} unknown" >> Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci
+fi
+
+done
+
+echo "Tname tGapStart tGapSize tGapEnd Samples iloci" |\
+ cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci > Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI
+
+grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci > Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci
+grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI > Seq.t_sum_Lg${GAP_MINSIZE_FP}.gILOCI
+
