@@ -243,8 +243,6 @@ fi
 
 done
 
-" > x2-WGinelT-${i}
-
 ##---------------------------
 #7. Report
 cd ${data_DIR}
