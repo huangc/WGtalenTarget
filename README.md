@@ -15,11 +15,11 @@ Transcription activator-like effector nuclease (TALEN) is a genetic engineering 
 2. Edit and prepare for the prerequisite files and softwares as described in PREREQ.sh, then `sh PREREQ.sh`
 3. Generate and submit qsub script for whole genome blat alignment: `sh x1-WGblat`
 4. Submit qsub script for whole genome indel analysis: `qsub x2-WGindelT`
-4. (alternatively) Submit x2 qsub script that run each sample in parallel: `qsub x2-WGindel-mp`
-5. Submit qsub script for TALE-NT2 target finder: `qsub x3-WGtalen`
-6. (Optional) submit qsub script for finding leftover TDNA vector sequence: `qsub x4-WGtdna`  
-7. Find main outputs in: *data/*.
-8. Cleanup files with: `sh xcleanup`
+5. (alternatively) Submit x2 qsub script that run each sample in parallel: `qsub x2-WGindel-mp`
+6. Submit qsub script for TALE-NT2 target finder: `qsub x3-WGtalen`
+7. (Optional) submit qsub script for finding leftover TDNA vector sequence: `qsub x4-WGtdna`  
+8. Find main outputs in: *data/*.
+9. Cleanup files with: `sh xcleanup`
 
 ## Sub-directories for workflow implementation:
 1. *prereq/*: prerequisite inputs such as retrieval and storage of TRegGA assembled contigs; retrieval and storage of reference genomes, preparation of BLAST+ database for reference genome.
