@@ -21,7 +21,7 @@ QUERYNAME=${i}.${SEQNAME}
 
 echo "
 #!/bin/bash
-source ./0SOURCE
+source ${WORK_DIR}/0SOURCE
 cd ${run_DIR}
 mkdir -p t_${i}
 cd t_${i}
