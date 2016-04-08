@@ -159,7 +159,7 @@ echo "Qname Tname QgapCount QgapBases TgapCount TgapBases blockCount qStart qEnd
 done
 
 ##-----------
-#4a. Make a indel summary table that combines same indels from all samples in each row based on the indel features, with the following columns:
+#4. Make a indel summary table that combines same indels from all samples in each row based on the indel features, with the following columns:
 # Tname TgapStart TgapSize Qname qGapStart qGapSize Samples, such as:
 # locus12345 1114 0 1357246 2476 500 YB1;YB2;YB4;YB5;YB6;YB8;
 # Note "q" (query) is for insertion, and "t" (target) is for deletion.
@@ -209,7 +209,7 @@ fi
 done
 done
 
-#5b. MAKE A summary indel table by getting all file names of $Tname.$tGapStart.$tGapSize.$Qname.$qGapStart.$qGapSize, 
+#5. MAKE A summary indel table by getting all file names of $Tname.$tGapStart.$tGapSize.$Qname.$qGapStart.$qGapSize, 
 # then making the newlines in each above file into ";", so
 # YB1
 # YB2
@@ -244,7 +244,7 @@ fi
 done
 
 ##---------------------------
-#7. Report
+#6. Report
 cd ${data_DIR}
 for indel in t_onQ t_sum
 do
