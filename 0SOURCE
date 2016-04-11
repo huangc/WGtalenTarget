@@ -153,8 +153,10 @@ QUERY=NIPPONBARE
 QUERYNAME=CX140
 #
 # Setup for iLocus
-LOCUSPOCUS_DIR=/home/huangcy/src/AEGEAN/AEGeAn/bin
-XTRACTORE_DIR=/home/huangcy/src/AEGEAN/AEGeAn/bin
+LOCUSPOCUS_DIR=/N/dc2/projects/brendelgroup/TRegGA/src/AEGEAN/AEGeAn/bin
+# LOCUSPOCUS_DIR=/home/huangcy/src/AEGEAN/AEGeAn/bin
+XTRACTORE_DIR=/N/dc2/projects/brendelgroup/TRegGA/src/AEGEAN/AEGeAn/bin
+# XTRACTORE_DIR=/home/huangcy/src/AEGEAN/AEGeAn/bin
 ILOCUSSEQ=OsjLOCUS.fa
 ILOCUSGFF=OsjLOCUS.gff3
 ILOCUSNAME=OsjLOCUS
