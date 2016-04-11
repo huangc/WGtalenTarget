@@ -27,7 +27,7 @@ mkdir -p iloci
 cd iloci
 ln -s ${prereq_DIR}/${MSUGFF} .
 ${LOCUSPOCUS_DIR}/locuspocus --delta ${DELTA} --cds --verbose --genemap ${ILOCUSNAME}.genemap --retainids --skipiiloci --outfile ${ILOCUSGFF} ${MSUGFF}
-${XTRACTORE_DIR}/xtractore --type=locus ${ILOCUSGFF} ${prereq_DIR}/${MSUSEQ} > ${ILOCUSSEQ}
+${XTRACTORE_DIR}/xtractore --type=locus ${ILOCUSGFF} ${prereq_DIR}/${REFSEQ} > ${ILOCUSSEQ}
 makeblastdb -in ${ILOCUSSEQ} -dbtype nucl -out ${DB_ILOCUS} -parse_seqids
 # sort -k 2,2 ${ILOCUSNAME}.genemap > tmp && \mv tmp ${ILOCUSNAME}.genemap
 
