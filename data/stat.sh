@@ -15,20 +15,6 @@ echo "## Aim1: To demonstrate that YB1 has very distinct Deletion Fingerprints (
 #----------------------------
 " > stat.result
 
-# Redefine the minimal size of deletion gap for the purpose of InDel fingerprinting
-# which uses a longer gap size for robust comparison
-GAP_MINSIZE_FP=100
-GAP_MAXSIZE_FP=5000
-
-# Refilter the deletion table according to the redefined GAP_MINSIZE.
-# DELSUM=SeqDel_sum_Lg5
-# Tname tGapStart tGapSize Samples
-# OsjChr10 10020508 30 YB4;
-# OsjChr10 10020526 6 YB2;YB3;YB6;YB7;
-
-awk -v gap_minsize="${GAP_MINSIZE_FP}" -v gap_maxsize="${GAP_MAXSIZE_FP}" '{ OFS="\t"; if ( $3 >= gap_minsize && $3 <= gap_maxsize ) print $0 }' \
- SeqDel_sum_Lg${GAP_MINSIZE}.table > SeqDel_sum_Lg${GAP_MINSIZE_FP}.table
-
 # Setup for comparison
 QUERY=NIPPONBARE
 QUERYNAME=CX140
