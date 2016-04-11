@@ -7,7 +7,7 @@
 module add python
 
 ## Aim: Find Deletion Fingerprints (DFP), which is defined as a set of deletions of the assembled contigs when compared to the reference genome. 
-#  The deletions are further restricted to the genic region (giloci) and to the length GAP_MINSIZE_FP in order to reduce the noise.
+#  The deletions are further restricted to the genic region (giloci) with the minimal length GAP_MINSIZE_FP in order to reduce the noise.
 
 # Input: Deletion summary table: ${data_DIR}/Seq.t_Lg${GAP_MINSIZE}.table, generated from x2-WGindelT with the content:
 # "Tname tGapStart tGapSize Samples" 
