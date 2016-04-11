@@ -14,6 +14,13 @@ wget ftp://ftp.ensemblgenomes.org/pub/plants/release-26/gff3/oryza_sativa/Oryza_
 # wget ftp://ftp.ensemblgenomes.org/pub/plants/release-26/fasta/oryza_sativa/cdna/Oryza_sativa.IRGSP-1.0.26.cdna.all.fa.gz
 # wget ftp://ftp.ensemblgenomes.org/pub/plants/release-26/fasta/oryza_sativa/pep/Oryza_sativa.IRGSP-1.0.26.pep.all.fa.gz
 
+#1a. Retrieve the rice Japonica gff3 file for iloci usage. 
+#  Note the gff3 from Plant Ensembl has non-canonical features, and should use the gff3 from MSU instead.
+wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/all.dir/all.gff3
+\mv all.gff3 ${MSUGFF}
+# change the Chr name from Chr to OsjChr to match with OsjCHR.fa
+sed -i 's/Chr/OsjChr/g' ${MSUGFF} 
+
 gunzip -f *.gz
 # mv Oryza_sativa.IRGSP-1.0.26.dat Oryza_sativa.IRGSP-1.0.26.embl
 
@@ -74,15 +81,4 @@ sed -e "s/^\([1-9]\)/OsjChr\1/" Oryza_sativa.IRGSP-1.0.26.gff3   | egrep "^##|^O
 #9. Verify the files have been downloaded and processed correctly.
 #
 # shasum -c checksums.sha
-
-
-#8 Retrieve the rice Japonica gff3 file for iloci usage. 
-#  Note the gff3 from Plant Ensembl has non-canonical features, and should use the gff3 from MSU instead.
-cd ${prereq_DIR}
-wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/all.dir/all.gff3
-# wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/all.dir/all.chrs.con
-\mv all.gff3 ${MSUGFF}
-# mv all.chrs.con ${MSUSEQ}
-# change the Chr name from Chr to OsjChr to match with OsjCHR.fa
-sed -i 's/Chr/OsjChr/g' ${MSUGFF} 
 
