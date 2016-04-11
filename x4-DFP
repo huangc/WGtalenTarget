@@ -6,18 +6,14 @@
 
 module add python
 
-## Aim1: To demonstrate that YB1 has very distinct Deletion Fingerprints (DFP) [1] as compared to YB2-YB8, while YB2-YB8 share similar DFP. 
-# Aim2: To investigate whether NIPPONBARE (CX140) is a close relative to sample YB1 as compared to YB2-YB8 samples.
-# Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to each other in phylogeny.
-# Method: Find DFP of CX140, YB1-YB8, then evaluate the proportion of shared deletion sites among them.
-# SeqDel_sum_Lg5.table contains the deletion sites in size range 100-5,000 bp of samples YB1-YB8, as well as NIPPONBARE (CX140), 
-# as compared to the reference Nipponbare IRGSP-1.0.
-# Samples: YB1, YB2, YB3, YB4, YB5, YB6, YB7, YB8
-# NIPPONBARE (cultivar CX140) is downloaded from 3kRGP.
+## Aim: Find Deletion Fingerprints (DFP), which is defined as a set of deletions of the assembled contigs when compared to the reference genome. 
+#  The deletions are further restricted to the genic region (giloci) and to the length GAP_MINSIZE_FP in order to reduce the noise.
 
-# [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome. 
-#     To reduce the noise, we define DFP as the deletions that are located in the genic region (iloci).
-# [2] Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
+# Input: Deletion summary table: ${data_DIR}/Seq.t_Lg${GAP_MINSIZE}.table, generated from x2-WGindelT with the content:
+# "Tname tGapStart tGapSize Samples" 
+# Methods: Filter the deletion summary table based on overlapping giloci.
+# Output: Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci, with the content:
+# "Tname tGapStart tGapSize tGapEnd Samples iloci"
 #----------------------------
 
 cd $PBS_O_WORKDIR
@@ -25,18 +21,17 @@ source ./0SOURCE
 cd ${run_DIR}
 
 #-----
-#1. Generate iLOCUS for the genic regions plus 1kb up- and downstram regions of the reference genome.
-#
+#1. Generate iLOCUS for the genic regions plus ${DELTA} kb up- and downstram regions of the reference genome.
+#   Note that MSUGFF instead of REFGFF is used here for the compatibility issue with program locuspocus.
 mkdir -p iloci
 cd iloci
-
-ln -s ${prereq_DIR}/${REFGFF} .
-/home/huangcy/src/AEGEAN/AEGeAn/bin/locuspocus --delta ${DELTA} --cds --verbose --genemap ${ILOCUSNAME}.genemap --retainids --skipiiloci --outfile ${ILOCUSGFF} ${REFGFF}
-/home/huangcy/src/AEGEAN/AEGeAn/bin/xtractore --type=locus ${ILOCUSGFF} ${prereq_DIR}/${REFSEQ} > ${ILOCUSSEQ}
+ln -s ${prereq_DIR}/${MSUGFF} .
+${LOCUSPOCUS_DIR}/locuspocus --delta ${DELTA} --cds --verbose --genemap ${ILOCUSNAME}.genemap --retainids --skipiiloci --outfile ${ILOCUSGFF} ${MSUGFF}
+${XTRACTORE_DIR}/xtractore --type=locus ${ILOCUSGFF} ${prereq_DIR}/${MSUSEQ} > ${ILOCUSSEQ}
 makeblastdb -in ${ILOCUSSEQ} -dbtype nucl -out ${DB_ILOCUS} -parse_seqids
 # sort -k 2,2 ${ILOCUSNAME}.genemap > tmp && \mv tmp ${ILOCUSNAME}.genemap
 
-#1. First extract the iloci records from ILOCUSGFF (OsjLOCUS.gff3)
+#2. Extract the iloci records from ILOCUSGFF (OsjLOCUS.gff3)
 # QsjChr1 AEGeAn::LocusPocus      locus   2903    11817   .       .       .       ID=locus1;Name=locus1;gene=1;mRNA=2;right_overlap=1600;iiLocus_exception=delta-overlap-gene;riil=0;effective_length=7315;iLocus_type=piLocus
 # OsjChr1 AEGeAn::LocusPocus      locus   10218   13435   .       .       .       ID=locus2;left_overlap=1600;liil=0;Name=locus2;gene=1;mRNA=1;right_overlap=1788;iiLocus_exception=delta-overlap-gene;riil=0;effective_length=1430;iLocus_type=piLocus
 
@@ -47,7 +42,7 @@ awk '{ print $1,$4,$5,$9 }' iLOCI.gff3 | sed 's/;/ /g' | awk '{ print $1,$2,$3,$
 # OsjChr1 2903 11817 locus1
 # OsjChr1 10218 13435 locus2
 
-## Re-filter the deletion table according to the redefined GAP_MINSIZE.
+#3. Re-filter the deletion table according to the redefined GAP_MINSIZE.
 # Tname tGapStart tGapSize Samples
 # OsjChr10 10744678 358 YB3;
 # OsjChr10 10766127 121 NIPPONBARE;YB2;YB3;YB4;YB5;YB6;YB7;YB8;
@@ -60,7 +55,7 @@ awk -v gap_minsize="${GAP_MINSIZE_FP}" -v gap_maxsize="${GAP_MAXSIZE_FP}" '{ OFS
  Seq.t_sum_Lg${GAP_MINSIZE}.table > Seq.t_sum_Lg${GAP_MINSIZE_FP}.table
 
 
-#2. Filter the deletion table based on overlapping iloci by
+#4. Filter the deletion table based on overlapping iloci by
 # removing the deletion records that are located entirely in the intergenic region (between iloci with no overlapping) 
 # step1: merge each deletion record with iLOCI.table. 
 # step2: Sort and grep the lines before and after ilocus record in the deletion table, 
