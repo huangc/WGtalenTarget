@@ -20,43 +20,6 @@ module add python
 # [2] Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
 #----------------------------
 
-# Redefine the minimal size of deletion gap for the purpose of InDel fingerprinting
-# which uses a longer gap size for robust comparison
-GAP_MINSIZE_FP=5
-GAP_MAXSIZE_FP=5000
-
-# Setup for comparison
-QUERY=NIPPONBARE
-QUERYNAME=CX140
-SAMPLE="YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8"
-SAMPLENAME=YB
-
-# Setup for iLocus
-LOCUSPOCUS_DIR=/home/huangcy/src/AEGEAN/AEGeAn/bin
-XTRACTORE_DIR=/home/huangcy/src/AEGEAN/AEGeAn/bin
-ILOCUSSEQ=OsjLOCUS.fa
-ILOCUSGFF=OsjLOCUS.gff3
-ILOCUSNAME=OsjLOCUS
-DELTA=1000
-ILOCUSSEQ_PTALEN=OsjpTALEN.fa
-DB_ILOCUS=OsjLOCUS
-
-
-# Retrieve the rice Japonica gff3 file. Note the gff3 from Plant Ensembl has non-canonical features, and should use the gff3 from MSU instead.
-cd ${prereq_DIR}
-wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/all.dir/all.gff3
-# wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/all.dir/all.chrs.con
-\mv all.gff3 ${REFGFF}
-# mv all.chrs.con ${REFSEQ}
-# wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/chr11.dir/Chr11.gff3
-# wget ftp://ftp.plantbiology.msu.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/chr11.dir/Chr11.con
-# mv Chr11.gff3 OsjCHR11.gff3
-# mv Chr11.con OsjCHR11.fa
-# change the Chr name from Chr to OsjChr to match with OsjCHR.fa
-sed -i 's/Chr/OsjChr/g' ${REFGFF} 
-
-
-##----------------------------
 cd $PBS_O_WORKDIR
 source ./0SOURCE
 cd ${run_DIR}
