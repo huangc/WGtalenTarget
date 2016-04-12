@@ -87,13 +87,7 @@ recSAMPLE=`cat rec_SAMPLE`
 echo "$Tname $tGapStart $tGapSize $tGapEnd $recSAMPLE" >> Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix
 done
 
-\rm rec.SAMPLE.name
-for i in ${SAMPLE}
-do
-echo $i >> rec.SAMPLE.name 
-done
-awk 1 ORS=';' rec.SAMPLE.name > rec_SAMPLE_name
-recSAMPLEname=`cat rec_SAMPLE_name`
+recSAMPLEname=`cat $SAMPLE | tr " " ";"`
 echo "Tname tGapStart tGapSize tGapEnd $recSAMPLEname" | cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix > Seq.t_sum_Lg${GAP_MINSIZE_FP}.Matrix
 
 ##----------------------
