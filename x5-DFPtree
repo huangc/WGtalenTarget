@@ -4,14 +4,16 @@
 #PBS -N x5-DFPtree
 #PBS -j oe
 
+module add python
+
 cd $PBS_O_WORKDIR
 source ./0SOURCE
-cd ${data_DIR}
+cd ${run_DIR}/iloci
 
 echo "## Aim: To reveal phylogenic relationship among sample cultivars based on their Deletion Fingerprints (DFP) [1].
 # Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to each other in phylogeny.
 # Input: Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci from x4-DFP
-# Method: Compute the proportion of shared deletion sites among sample cultivars, then construct a phylogenic tree.
+# Method: Compute the distance matrix of shared deletion sites among sample cultivars, then construct a phylogenic tree.
 # Output: phylogenic tree of sample cultivars.
 
 # [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome. The deletions are
@@ -47,64 +49,62 @@ echo "## Aim: To reveal phylogenic relationship among sample cultivars based on 
 
 # Setup for comparison
 # SAMPLE="YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8"
-SAMPLE="A2_257 BINIAPAN CHINGLIU GINMASARI KEYANUNIA KOTOOURA MANYALOJOPOIHUN NIPPONBARE PATIEROUGE ARC11571 CHINGCHUNG CR441 JC_157 KOTOBUKIMOCHI MADHU\
-WAKARIA NIAOYAO OSATIVA SACHIKAZE"
+# SAMPLE="A2_257 BINIAPAN CHINGLIU GINMASARI KEYANUNIA KOTOOURA MANYALOJOPOIHUN NIPPONBARE PATIEROUGE ARC11571 CHINGCHUNG CR441 JC_157 KOTOBUKIMOCHI MADHUWAKARIA NIAOYAO OSATIVA SACHIKAZE"
+SAMPLE="GINMASARI KOTOBUKIMOCHI NIPPONBARE SACHIKAZE BINIAPAN KOTOOURA PATIEROUGE MANYALOJOPOIHUN A2_257 ARC11571 JC_157 KEYANUNIA MADHUWAKARIA CR441 OSATIVA CHINGCHUNG NIAOYAO CHINGLIU"
 SAMPLENAME=VarGrp
 SAMPLENUM=18
 
+#1 Input is file Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci with the content such as:
+# Tname tGapStart tGapSize tGapEnd Samples iloci
+# OsjChr1 10008136 275 10008411 CHINGLIU;KEYANUNIA;ARC11571;CHINGCHUNG;CR441;JC_157;MADHUWAKARIA;NIAOYAO;OSATIVA; locus1510
+# Transform the above table into a matrix ush as:
+# Tname tGapStart tGapSize tGapEnd A2_257;BINIAPAN;CHINGLIU;GINMASARI;KEYANUNIA;KOTOOURA;MANYALOJOPOIHUN;NIPPONBARE;PATIEROUGE;ARC11571;CHINGCHUNG;
+# OsjChr1 10008136 275 10008411 0;0;1;0;1;0;0;0;0;1;1;
 
-\rm -f FP*
+\rm Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix
+len=`awk 'END { print NR }' Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci`
+for ((k=1; k<=$len; k++))
+do
+head -$k Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci | tail -1 > rec
+Tname=`cut -d " " -f1 rec`
+tGapStart=`cut -d " " -f2 rec`
+tGapSize=`cut -d " " -f3 rec`
+tGapEnd=`cut -d " " -f4 rec`
+Samples=`cut -d " " -f5 rec | tr ";" " "`
+iloci=`cut -d " " -f6 rec`
+
+\rm rec.SAMPLE
 for i in ${SAMPLE}
 do
-egrep "(${QUERY}|$i)" SeqDel_sum_Lg${GAP_MINSIZE_FP}.table > FP_union_${QUERYNAME}_${i}
-egrep "${QUERY}" SeqDel_sum_Lg${GAP_MINSIZE_FP}.table | egrep "$i" > FP_intcpt_${QUERYNAME}_${i}
+if [[ $Samples =~ $i  ]]; then
+    echo "1" >> rec.SAMPLE
+else
+    echo "0" >> rec.SAMPLE 
+fi
+done
+awk 1 ORS=';' rec.SAMPLE > rec_SAMPLE
+recSAMPLE=`cat rec_SAMPLE`
+echo "$Tname $tGapStart $tGapSize $tGapEnd $recSAMPLE" >> Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix
 done
 
-
-target=`wc -l SeqDel_sum_Lg${GAP_MINSIZE_FP}.table | cut -d" " -f1`
-echo "Total deletion sites in SeqDel_sum_Lg${GAP_MINSIZE_FP}.table are $target" >> stat.result
-
-query=`grep "NIPPONBARE" SeqDel_sum_Lg${GAP_MINSIZE_FP}.table | wc -l | cut -d" " -f1`
-echo "Total deletion sites from ${QUERYNAME} are $query" >> stat.result
-
-# grep union of all samples
-egrep "(YB1|YB2|YB3|YB4|YB5|YB6|YB7|YB8)" SeqDel_sum_Lg${GAP_MINSIZE_FP}.table > FP_union_${SAMPLENAME}
-samples=`wc -l FP_union_${SAMPLENAME} | cut -d" " -f1`
-echo "Total deletion sites from ${SAMPLENAME} samples are ${samples}" >> stat.result
-
-# grep intercept of all samples
-egrep "${QUERY}" SeqDel_sum_Lg${GAP_MINSIZE_FP}.table | egrep "YB1" | egrep "YB2" | \
-egrep "YB3" | egrep "YB4" | egrep "YB5" | egrep "YB6" | \
-egrep "YB7" | egrep "YB8" > FP_intcpt_${QUERYNAME}_${SAMPLENAME}
-query_samples=`wc -l FP_intcpt_${QUERYNAME}_${SAMPLENAME} | cut -d" " -f1`
-echo "Total deletion sites that are shared among ${QUERYNAME} and ${SAMPLENAME} samples are ${query_samples}" >> ${SAMPLENAME}_phylotree.result
-echo "" >> stat.result
-
-
+\rm rec.SAMPLE.name
 for i in ${SAMPLE}
 do
-echo "##" >> stat.result
-sample=`grep "$i" SeqDel_sum_Lg${GAP_MINSIZE_FP}.table | wc -l | cut -d" " -f1`
-echo "Total deletion sites from sample ${i} are $sample" >> stat.result
-query_sample=`wc -l FP_intcpt_${QUERYNAME}_${i}  | cut -d" " -f1`
-echo "Total deletion sites from sample ${i} that are also shared with ${QUERYNAME} are ${query_sample}" >> stat.result
-perc_sample=`awk "BEGIN { print ${query_sample}/${sample}*100 }"`
-echo "Percentage of deletion sites that are shared by ${i} and ${QUERYNAME} as compared to deletion sites of sample ${i} is ${perc_sample}%" >> stat.res\
-ult
+echo $i >> rec.SAMPLE.name 
 done
+awk 1 ORS=';' rec.SAMPLE.name > rec_SAMPLE_name
+recSAMPLEname=`cat rec_SAMPLE_name`
+echo "Tname tGapStart tGapSize tGapEnd $recSAMPLEname" | cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix > Seq.t_sum_Lg${GAP_MINSIZE_FP}.Matrix
 
-echo "
+##----------------------
+#2 Python scriptto take the Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix and compute the distance matrix
 
-#-------------------------
-## Conclusion:
-#1. The NIPPONBARE (CX140) from 3kRGP has already accumulated 694 deletions as compared to the reference of its own.
-#2. Using deletion sites as fingerprinting marker, NIPPONBARE shared similar number of deletions (187-212, average 201)
-#   with individual sample. Among them, 80 deletions sites are shared for NIPPONBARE and all YB1-YB8.
-#3. There are 2.86 folds more deletions in YB2-YB8 than in YB1, as compared to the reference Nipponbare.
-#4. YB1 has higher percentage (10%) of Nipponbare-shared deletion sites than other YB samples (~3.8%).
-#5. It is likely that YB1 is a cultivar closer to NIPPONBARE than YB2-YB8 are to NIPPONBARE, based on the observations #3 and #4.
-#6. The Indel fingerprinting result is consistent with the SNP fingerprinting result, which shows strong evidence that
-#   NIPPONBARE is the closest relative among all 3kRGP to YB1.
 
-" >> ${SAMPLENAME}_phylotree.result
+
+
+
+
+
+
+
 
