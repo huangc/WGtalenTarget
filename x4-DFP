@@ -130,8 +130,8 @@ done
 echo "Tname tGapStart tGapSize tGapEnd Samples iloci" |\
  cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci > Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI
 
-grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci > Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci
-grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI > Seq.t_sum_Lg${GAP_MINSIZE_FP}.gILOCI
+grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci | grep -v "unknown" > Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci
+grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI | grep -v "unknown" > Seq.t_sum_Lg${GAP_MINSIZE_FP}.gILOCI
 
 cd ${data_DIR}
 \cp ${run_DIR}/iloci/Seq.t_sum_Lg${GAP_MINSIZE_FP}.* .
