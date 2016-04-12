@@ -87,7 +87,7 @@ recSAMPLE=`cat rec_SAMPLE`
 echo "$Tname $tGapStart $tGapSize $tGapEnd $recSAMPLE" >> Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix
 done
 
-recSAMPLEname=`cat $SAMPLE | tr " " ";"`
+recSAMPLEname=`echo $SAMPLE | tr " " ";"`
 echo "Tname tGapStart tGapSize tGapEnd $recSAMPLEname" | cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix > Seq.t_sum_Lg${GAP_MINSIZE_FP}.Matrix
 
 ##----------------------
