@@ -95,9 +95,23 @@ done
 recSAMPLEname=`echo $SAMPLE`
 echo "Tname_tGapStart_tGapSize_tGapEnd $recSAMPLEname" | cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix > Seq.t_sum_Lg${GAP_MINSIZE_FP}.Matrix
 
+
 ##----------------------
 #2 Python scriptto take the Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix and compute the distance matrix
 
+
+
+
+
+
+##----------------------
+## Cleanup and report
+cd ${run_DIR}/iloci
+\rm -r delrec*
+
+cd ${data_DIR}
+\cp ${run_DIR}/iloci/Seq.t_sum_Lg${GAP_MINSIZE_FP}.* .
+rename Seq.t ${SAMPLENAME}_SeqDel Seq.t*
 
 
 
