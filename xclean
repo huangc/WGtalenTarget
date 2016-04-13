@@ -31,3 +31,8 @@ cd ${run_DIR}/ptalen
 mkdir -p ${scratch_DIR}/ptalen/deletion
 mv Prec* ${scratch_DIR}/ptalen/deletion
 
+# cleanup iloci intermediate files
+cd ${run_DIR}/iloci
+mkdir DELREC
+mv delrec* DELREC
+
