@@ -110,7 +110,7 @@ cd ${run_DIR}/iloci
 \rm -r delrec*
 
 cd ${data_DIR}
-\cp ${run_DIR}/iloci/Seq.t_sum_Lg${GAP_MINSIZE_FP}.* .
+\cp -r ${run_DIR}/iloci/Seq.t_sum_Lg${GAP_MINSIZE_FP}.* .
 rename Seq.t ${SAMPLENAME}_SeqDel Seq.t*
 
 
