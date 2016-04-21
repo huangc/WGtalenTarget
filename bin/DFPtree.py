@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
 
-
 # module add python
 import sys
 import numpy as np
