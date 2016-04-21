@@ -36,7 +36,7 @@ for i in df.columns:
         DM3.ix[i,j] = sum(abs(df.ix[:,i] - df.ix[:,j])) * 100 / 12738.0 
 
 # Output DM2
-DM2.to_csv(outfile, sep='\t', float_format='%.2f')
+# DM2.to_csv(outfile, sep='\t', float_format='%.2f')
 
 # Compute and plot first dendrogram.
 fig = plt.figure(figsize=(8,8))
@@ -65,10 +65,12 @@ im = axmatrix.matshow(DM2b, aspect='auto', origin='lower', cmap=plt.cm.YlGnBu)
 axmatrix.set_xticks(idx2, minor=True)
 # axmatrix.set_xticklabels(idx2a, fontdict=None, minor=True, horizontalalignment='center', rotation='vertical')
 
+# Output DM2b
+DM2b.to_csv(outfile, sep='\t', float_format='%.2f')
+
 
 # Plot colorbar.
 axcolor = fig.add_axes([0.91,0.1,0.02,0.6])
 plt.colorbar(im, cax=axcolor)
 fig.show()
 fig.savefig('dendrogram.png')
-
