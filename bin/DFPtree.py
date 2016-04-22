@@ -44,12 +44,6 @@ Y2 = linkage(DM, method='centroid')
 Z2 = dendrogram(Y2, labels=DM.index, leaf_font_size=9)
 idx2 = Z2['leaves']
 
-# Plot colorbar and save figure
-axcolor = fig.add_axes([0.91,0.1,0.02,0.6])
-plt.colorbar(im, cax=axcolor)
-fig.show()
-fig.savefig('Seq.t_sum_dendrogram.png')
-
 # Plot distance matrix.
 DM1 = DM.ix[idx1,:]
 DM2 = DM1.ix[:,idx2]
@@ -58,6 +52,12 @@ axmatrix.set_xticks([])
 axmatrix.set_yticks([])
 # axmatrix.set_xticks(idx2, minor=True)
 # axmatrix.set_xticklabels(idx2a, fontdict=None, minor=True, fontsize='small', horizontalalignment='center')
+
+# Plot colorbar and save figure
+axcolor = fig.add_axes([0.91,0.1,0.02,0.6])
+plt.colorbar(im, cax=axcolor)
+fig.show()
+fig.savefig('Seq.t_sum_dendrogram.png')
 
 # Output DM2
 DM2.to_csv(outfile, sep='\t', float_format='%.2f')
