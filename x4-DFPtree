@@ -30,7 +30,7 @@ ln -s ${prereq_DIR}/${MSUGFF} .
 ${LOCUSPOCUS_DIR}/locuspocus --delta ${DELTA} --cds --verbose --genemap ${ILOCUSNAME}.genemap --retainids --skipiiloci --outfile ${ILOCUSGFF} ${MSUGFF}
 ${XTRACTORE_DIR}/xtractore --type=locus ${ILOCUSGFF} ${prereq_DIR}/${REFSEQ} > ${ILOCUSSEQ}
 makeblastdb -in ${ILOCUSSEQ} -dbtype nucl -out ${DB_ILOCUS} -parse_seqids
-sort -k 2,2 ${ILOCUSNAME}.genemap > tmp && \mv tmp ${ILOCUSNAME}.genemap
+# sort -k 2,2 ${ILOCUSNAME}.genemap > tmp && \mv tmp ${ILOCUSNAME}.genemap
 
 #2. Extract the iloci records from ILOCUSGFF (OsjLOCUS.gff3)
 # QsjChr1 AEGeAn::LocusPocus      locus   2903    11817   .       .       .       ID=locus1;Name=locus1;gene=1;mRNA=2;right_overlap=1600;iiLocus_exception=delta-overlap-gene;riil=0;effective_length=7315;iLocus_type=piLocus
