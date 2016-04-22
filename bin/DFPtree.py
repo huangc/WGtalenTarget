@@ -36,11 +36,11 @@ Z1 = dendrogram(Y1, orientation='right')
 idx1 = Z1['leaves']
 idx1a = DM.columns[idx1]
 # ax1.set_yticks(idx1, minor=True)
-# ax1.set_yticklabels(idx1a, fontdict=None, minor=True, horizontalalignment='center')
+# ax1.set_yticklabels(idx1a, fontdict=None, minor=True, fontsize='small', horizontalalignment='center', verticalalignment='center')
 
 # Compute and plot second dendrogram.
 ax2 = fig.add_axes([0.3,0.71,0.6,0.2])
-Y2 = linkage(DM, method='single')
+Y2 = linkage(DM, method='centroid')
 Z2 = dendrogram(Y2)
 idx2 = Z2['leaves']
 idx2a = DM.columns[idx2]
@@ -53,7 +53,7 @@ DM1 = DM.ix[idx1,:]
 DM2 = DM1.ix[:,idx2]
 im = axmatrix.matshow(DM2, aspect='auto', origin='lower', cmap=plt.cm.YlGnBu)
 axmatrix.set_xticks(idx2, minor=True)
-# axmatrix.set_xticklabels(idx2a, fontdict=None, minor=True, horizontalalignment='center', rotation='vertical')
+axmatrix.set_xticklabels(idx2a, fontdict=None, minor=True, fontsize='small', horizontalalignment='center', rotation='vertical', verticalalignment='center')
 
 # Output DM2
 DM2.to_csv(outfile, sep='\t', float_format='%.2f')
