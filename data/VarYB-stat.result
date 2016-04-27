@@ -1,7 +1,7 @@
 ## Aim: To reveal the phylogenic relationship of YB1 as compared to VarYB using Deletion Fingerprints (DFP) [1].
 # Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to each other in phylogeny.
 # Method: Find shared DFP of YB1 and VarYB, then evaluate the proportion of shared deletion sites among them.
-# Input: VarYB_SeqDel_sum_Lg20.table contains the deletion sites in size range 100-5,000 bp of samples in the genic region plus 100 bp up- and downstream.
+# Input: VarYB_SeqDel_sum_Lg20.table contains the deletion sites in size range 20-5,000 bp of samples in the genic region plus 100 bp up- and downstream.
 # VarYB samples: YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8 GINMASARI KOTOBUKIMOCHI NIPPONBARE SACHIKAZE BINIAPAN KOTOOURA PATIEROUGE MANYALOJOPOIHUN A2_257 ARC11571 JC_157 KEYANUNIA MADHUWAKARIA CR441 OSATIVA CHINGCHUNG NIAOYAO CHINGLIU
 # [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome.
 # To reduce the noise, we define DFP as the deletions that are located in the genic region (iloci).
