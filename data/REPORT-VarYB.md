@@ -1,5 +1,5 @@
 ### Numbers of the Deletion Fingerprints (DFP) of the sample cultivars:
-DFP are deletions of the assembled contigs when compared to the reference genome. They are further restricted to size 20-5000 bp and located in genic region plus up-/down- stream 100bp.
+DFP are deletions of the assembled contigs when compared to the reference genome (by Blat alignment). They are further restricted to size 20-5000 bp and located in genic region plus up-/down- stream 100bp.
 
 #### Temperate japonica
 * GINMASARI: 387
