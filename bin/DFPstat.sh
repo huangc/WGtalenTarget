@@ -3,8 +3,7 @@
 # PARAMETERS
 QUERY=YB1
 QUERYNAME=YB1
-SAMPLE="YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8 GINMASARI KOTOBUKIMOCHI NIPPONBARE SACHIKAZE BINIAPAN KOTOOURA PATIEROUGE \
-MANYALOJOPOIHUN A2_257 ARC11571 JC_157 KEYANUNIA MADHUWAKARIA CR441 OSATIVA CHINGCHUNG NIAOYAO CHINGLIU"
+SAMPLE="YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8 GINMASARI KOTOBUKIMOCHI NIPPONBARE SACHIKAZE BINIAPAN KOTOOURA PATIEROUGE MANYALOJOPOIHUN A2_257 ARC11571 JC_157 KEYANUNIA MADHUWAKARIA CR441 OSATIVA CHINGCHUNG NIAOYAO CHINGLIU"
 SAMPLENAME=VarYB
 SANPLENUM=26
 INFILE="VarYB_SeqDel_sum_Lg20.table"
@@ -17,20 +16,14 @@ cd ${SAMPLENAME}-on-${QUERYNAME}
 \rm -f FP*
 
 ##--------------------------
-echo "## Aim: To reveal the phylogenic relationship of ${QUERYNAME} as compared to ${SAMPLENAME} using Deletion Fi\
-ngerprints (DFP) [1].
-# Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to\
- each other in phylogeny.
-# Method: Find shared DFP of ${QUERYNAME} and ${SAMPLENAME}, then evaluate the proportion of shared deletion sites\
- among them.
-# Input: ${INFILE} contains the deletion sites in size range 100-5,000 bp of samples in the genic region plus 100 \
-bp up- and downstream.
+echo "## Aim: To reveal the phylogenic relationship of ${QUERYNAME} as compared to ${SAMPLENAME} using Deletion Fingerprints (DFP) [1].
+# Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to each other in phylogeny.
+# Method: Find shared DFP of ${QUERYNAME} and ${SAMPLENAME}, then evaluate the proportion of shared deletion sites among them.
+# Input: ${INFILE} contains the deletion sites in size range 100-5,000 bp of samples in the genic region plus 100 bp up- and downstream.
 # ${SAMPLENAME} samples: ${SAMPLE}
-# [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome\
-.
+# [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome.
 # To reduce the noise, we define DFP as the deletions that are located in the genic region (iloci).
-# [2] Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared s\
-amples.
+# [2] Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
 #----------------------------
 " > ${OUTFILE}
 
@@ -72,6 +65,6 @@ done
 # egrep "YB3" | egrep "YB4" | egrep "YB5" | egrep "YB6" | \
 # egrep "YB7" | egrep "YB8" > FP_intcpt_${QUERYNAME}_${SAMPLENAME}
 # query_samples=`wc -l FP_intcpt_${QUERYNAME}_${SAMPLENAME} | cut -d" " -f1`
-# echo "Total deletion sites that are shared among ${QUERYNAME} and ${SAMPLENAME} samples are ${query_samples}" >>\
- ${OUTFILE}
+# echo "Total deletion sites that are shared among ${QUERYNAME} and ${SAMPLENAME} samples are ${query_samples}" >> ${OUTFILE}
 # echo "" >> ${OUTFILE}
+
