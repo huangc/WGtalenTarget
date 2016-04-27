@@ -1,7 +1,7 @@
 ##Considering of deletions in size 20-5000 bp and located in genic region plus up-/down- stream 100bp, the deletion numbers of the cultivars are:
 
 #### Temperate japonica
-*GINMASARI: 387
+* GINMASARI: 387
 *KOTOBUKIMOCHI: 335
 *NIPPONBARE (CX140): 127
 *SACHIKAZE: 234
