@@ -9,7 +9,9 @@ SANPLENUM=26
 INFILE="VarYB_SeqDel_sum_Lg20.table"
 OUTFILE="VarYB-stat.result"
 
-##--------------------------
+##------------------------------
+## NO MODIFICATION NEEDED BELOW
+##------------------------------
 mkdir -p ${SAMPLENAME}-on-${QUERYNAME}
 \cp ${INFILE} ${SAMPLENAME}-on-${QUERYNAME}
 cd ${SAMPLENAME}-on-${QUERYNAME}
