@@ -1,0 +1,116 @@
+## Aim: To reveal the phylogenic relationship of YB1 as compared to VarYB using Deletion Fingerprints (DFP) [1].
+# Proposition: Rice cultivars with high proportion of shared deletion sites [2] have similar DFP, and are close to each other in phylogeny.
+# Method: Find shared DFP of YB1 and VarYB, then evaluate the proportion of shared deletion sites among them.
+# Input: VarYB_SeqDel_sum_Lg20.table contains the deletion sites in size range 100-5,000 bp of samples in the genic region plus 100 bp up- and downstream.
+# VarYB samples: YB1 YB2 YB3 YB4 YB5 YB6 YB7 YB8 GINMASARI KOTOBUKIMOCHI NIPPONBARE SACHIKAZE BINIAPAN KOTOOURA PATIEROUGE MANYALOJOPOIHUN A2_257 ARC11571 JC_157 KEYANUNIA MADHUWAKARIA CR441 OSATIVA CHINGCHUNG NIAOYAO CHINGLIU
+# [1] Deletion Fingerprints (DFP): Set of deletions of the assembled contigs when compared to the reference genome.
+# To reduce the noise, we define DFP as the deletions that are located in the genic region (iloci).
+# [2] Shared deletion site: the deletion site has EXACT start and end position in the reference for the compared samples.
+#----------------------------
+
+Total deletion sites in VarYB_SeqDel_sum_Lg20.table are 45075
+Total deletion sites in YB1 are 1196
+##
+Total deletion sites in sample YB1 is 1196
+Total shared deletion sites with YB1 in sample YB1 is 1196
+Percentage of shared deletion sites with YB1 in sample YB1 is 100%
+##
+Total deletion sites in sample YB2 is 2536
+Total shared deletion sites with YB1 in sample YB2 is 124
+Percentage of shared deletion sites with YB1 in sample YB2 is 4.88959%
+##
+Total deletion sites in sample YB3 is 2718
+Total shared deletion sites with YB1 in sample YB3 is 149
+Percentage of shared deletion sites with YB1 in sample YB3 is 5.48197%
+##
+Total deletion sites in sample YB4 is 2768
+Total shared deletion sites with YB1 in sample YB4 is 155
+Percentage of shared deletion sites with YB1 in sample YB4 is 5.59971%
+##
+Total deletion sites in sample YB5 is 2889
+Total shared deletion sites with YB1 in sample YB5 is 156
+Percentage of shared deletion sites with YB1 in sample YB5 is 5.39979%
+##
+Total deletion sites in sample YB6 is 2901
+Total shared deletion sites with YB1 in sample YB6 is 145
+Percentage of shared deletion sites with YB1 in sample YB6 is 4.99828%
+##
+Total deletion sites in sample YB7 is 2885
+Total shared deletion sites with YB1 in sample YB7 is 136
+Percentage of shared deletion sites with YB1 in sample YB7 is 4.71404%
+##
+Total deletion sites in sample YB8 is 2926
+Total shared deletion sites with YB1 in sample YB8 is 163
+Percentage of shared deletion sites with YB1 in sample YB8 is 5.57075%
+##
+Total deletion sites in sample GINMASARI is 1024
+Total shared deletion sites with YB1 in sample GINMASARI is 48
+Percentage of shared deletion sites with YB1 in sample GINMASARI is 4.6875%
+##
+Total deletion sites in sample KOTOBUKIMOCHI is 927
+Total shared deletion sites with YB1 in sample KOTOBUKIMOCHI is 49
+Percentage of shared deletion sites with YB1 in sample KOTOBUKIMOCHI is 5.28587%
+##
+Total deletion sites in sample NIPPONBARE is 380
+Total shared deletion sites with YB1 in sample NIPPONBARE is 65
+Percentage of shared deletion sites with YB1 in sample NIPPONBARE is 17.1053%
+##
+Total deletion sites in sample SACHIKAZE is 668
+Total shared deletion sites with YB1 in sample SACHIKAZE is 55
+Percentage of shared deletion sites with YB1 in sample SACHIKAZE is 8.23353%
+##
+Total deletion sites in sample BINIAPAN is 3497
+Total shared deletion sites with YB1 in sample BINIAPAN is 44
+Percentage of shared deletion sites with YB1 in sample BINIAPAN is 1.25822%
+##
+Total deletion sites in sample KOTOOURA is 3540
+Total shared deletion sites with YB1 in sample KOTOOURA is 50
+Percentage of shared deletion sites with YB1 in sample KOTOOURA is 1.41243%
+##
+Total deletion sites in sample PATIEROUGE is 3870
+Total shared deletion sites with YB1 in sample PATIEROUGE is 59
+Percentage of shared deletion sites with YB1 in sample PATIEROUGE is 1.52455%
+##
+Total deletion sites in sample MANYALOJOPOIHUN is 4175
+Total shared deletion sites with YB1 in sample MANYALOJOPOIHUN is 65
+Percentage of shared deletion sites with YB1 in sample MANYALOJOPOIHUN is 1.55689%
+##
+Total deletion sites in sample A2_257 is 4555
+Total shared deletion sites with YB1 in sample A2_257 is 83
+Percentage of shared deletion sites with YB1 in sample A2_257 is 1.82217%
+##
+Total deletion sites in sample ARC11571 is 4772
+Total shared deletion sites with YB1 in sample ARC11571 is 40
+Percentage of shared deletion sites with YB1 in sample ARC11571 is 0.838223%
+##
+Total deletion sites in sample JC_157 is 5236
+Total shared deletion sites with YB1 in sample JC_157 is 57
+Percentage of shared deletion sites with YB1 in sample JC_157 is 1.08862%
+##
+Total deletion sites in sample KEYANUNIA is 5385
+Total shared deletion sites with YB1 in sample KEYANUNIA is 57
+Percentage of shared deletion sites with YB1 in sample KEYANUNIA is 1.0585%
+##
+Total deletion sites in sample MADHUWAKARIA is 5384
+Total shared deletion sites with YB1 in sample MADHUWAKARIA is 52
+Percentage of shared deletion sites with YB1 in sample MADHUWAKARIA is 0.965825%
+##
+Total deletion sites in sample CR441 is 5368
+Total shared deletion sites with YB1 in sample CR441 is 60
+Percentage of shared deletion sites with YB1 in sample CR441 is 1.11773%
+##
+Total deletion sites in sample OSATIVA is 8189
+Total shared deletion sites with YB1 in sample OSATIVA is 40
+Percentage of shared deletion sites with YB1 in sample OSATIVA is 0.48846%
+##
+Total deletion sites in sample CHINGCHUNG is 9381
+Total shared deletion sites with YB1 in sample CHINGCHUNG is 55
+Percentage of shared deletion sites with YB1 in sample CHINGCHUNG is 0.586291%
+##
+Total deletion sites in sample NIAOYAO is 7669
+Total shared deletion sites with YB1 in sample NIAOYAO is 31
+Percentage of shared deletion sites with YB1 in sample NIAOYAO is 0.404225%
+##
+Total deletion sites in sample CHINGLIU is 8389
+Total shared deletion sites with YB1 in sample CHINGLIU is 45
+Percentage of shared deletion sites with YB1 in sample CHINGLIU is 0.536417%
