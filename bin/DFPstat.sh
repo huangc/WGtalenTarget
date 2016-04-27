@@ -47,7 +47,8 @@ sample=`grep "$i" ${INFILE} | wc -l | cut -d" " -f1`
 echo "Total deletion sites in sample ${i} is $sample" >> ${OUTFILE}
 query_sample=`wc -l FP_intcpt_${QUERYNAME}_${i}  | cut -d" " -f1`
 echo "Total shared deletion sites with ${QUERYNAME} in sample ${i} is ${query_sample}" >> ${OUTFILE}
-perc_sample=`awk "BEGIN { print ${query_sample}/${sample}*100 }"`
+# perc_sample=`awk "BEGIN { print ${query_sample}/${sample}*100 }"`
+perc_sample=`awk -v query_sample="${query_sample}" -v sample="${sample}" "BEGIN { print query_sample/sample*100 }"`
 echo "Percentage of shared deletion sites with ${QUERYNAME} in sample ${i} is ${perc_sample}%" >> ${OUTFILE}
 done
 
