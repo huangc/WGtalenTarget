@@ -1,4 +1,4 @@
-### Numbers of the Deletion Fingerprints (DFP) of the sample cultivars:
+### Numbers of the Deletion Fingerprints (DFP) of the sample cultivars (see details in VarYB-stat.result):
 DFP are deletions of the assembled contigs when compared to the reference genome (by Blat alignment). They are further restricted to size 20-5000 bp and located in genic region plus up-/down- stream 100bp.
 
 #### YB samples
@@ -37,7 +37,11 @@ DFP are deletions of the assembled contigs when compared to the reference genome
 * NIAOYAO: 7669
 * CHINGLIU: 8389
 
-#### Summary
-The trend shows that DFP numbers are:
-* Temperate japonica < Tropical japonica < Basmati/Aus < Indica
+#### Summary 
+Summary by DFP numbers (VarYB-stat.result):
+* Temperate_japonica < YB1 < YB2-8 < Tropical_japonica < Basmati/Aus < Indica
+* YB2-8 samples have in average 2.34 fold more DFPs than in YB1.   
+
+Summary by DFP phylogeny (VarYB_SeqDel_sum_dendrogram.png):
+* YB1 is significantly closer to the Temperate japonica representatives than YB2-8.
 
