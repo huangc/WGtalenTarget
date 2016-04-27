@@ -1,7 +1,7 @@
-### Deletion Fingerprints (DFP) numbers of the sample cultivars:
+#### Deletion Fingerprints (DFP) numbers of the sample cultivars:
 DFP are deletions of the assembled contigs when compared to the reference genome (by Blat alignment). They are further restricted to size 20-5000 bp and located in genic region plus up-/down- stream 100bp.
 
-#### YB samples
+##### YB samples
 * YB1: 1196
 * YB2: 2536
 * YB3: 2718
