@@ -40,7 +40,7 @@ DFP are deletions of the assembled contigs when compared to the reference genome
 #### Summary
 ##### Summary by DFP numbers (VarYB-stat.result):
 * Temperate_japonica < YB1 < YB2-8 < Tropical_japonica < Basmati/Aus < Indica
-* YB2-8 samples have in average 2.34 fold more DFPs than in YB1.   
+* YB2-8 samples have in average 2.34 folds more DFPs than YB1.   
 
 ##### Summary by DFP phylogeny (VarYB_SeqDel_sum_dendrogram.png):
 * YB1 is significantly closer to the Temperate japonica representatives than YB2-8.
