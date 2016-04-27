@@ -27,6 +27,6 @@ DFP are deletions of the assembled contigs when compared to the reference genome
 * NIAOYAO: 3190
 * CHINGLIU: 3538
 
-#### The trend shows the DFP numbers are:
+#### The trend shows taht DFP numbers are:
 * Temperate japonica < Tropical japonica < Basmati/Aus < Indica
 
