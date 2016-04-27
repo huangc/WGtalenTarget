@@ -1,4 +1,4 @@
-##Considering of deletions in size 20-5000 bp and located in genic region plus up-/down- stream 100bp, the deletion numbers of the cultivars are:
+### Considering of deletions in size 20-5000 bp and located in genic region plus up-/down- stream 100bp, the number of deletions in the cultivars are:
 
 #### Temperate japonica
 * GINMASARI: 387
