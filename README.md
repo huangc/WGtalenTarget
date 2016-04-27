@@ -15,10 +15,9 @@ Transcription activator-like effector nuclease (TALEN) is a genetic engineering 
 2. Edit and prepare for the prerequisite files and softwares as described in PREREQ.sh, then `sh PREREQ.sh`
 3. Generate and submit qsub script for whole genome blat alignment: `sh x1-WGblat`
 4. Whole genome indel analysis: `qsub x2-WGindelT`
-5. (Alternatively) run x2 in parallel: `qsub x2-WGindelT-mp`
-6. TALE-NT2 target finder: `qsub x3-WGtalen`
-7. (Optional) Find leftover TDNA vector sequence: `qsub x4-WGtdna`  
-8. (Optional) Find Deletion Fingerprints (DFP) and phylogenic relationship of samples: `qsub x5-DFPtree`
+5. TALE-NT2 target finder: `qsub x3-WGtalen`
+6. (Optional) Find leftover TDNA vector sequence: `qsub x4-WGtdna`  
+7. (Optional) Find Deletion Fingerprints (DFP) and phylogenic relationship of samples: `qsub x5-DFPtree`
 8. Find main outputs in: *data/*.
 9. Cleanup files with: `sh xcleanup`
 
