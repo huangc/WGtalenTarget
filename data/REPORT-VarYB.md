@@ -1,7 +1,8 @@
 #### Deletion Fingerprint (DFP) numbers of the sample cultivars:
 * DFP are deletions of the assembled contigs when compared to reference genome by Blat alignment. They are further restricted to size range 20-5,000 bp and limited to genic region plus up-/down- stream 100 bp.
 * Shared DFPs are defined as DFPs that have the exact same deletion start and end positions on the reference genome.
-* The DFP distance between sample i and j is defined as the Hamming distance of the DFP profiles between i and j, divided by the total DFP number of all samples in comparison.
+* DFP vector is a binary vector of sample that represents the prsence/absence of each accounted DFPs from all samples in comparison.
+* The DFP distance between sample i and j is defined as the Hamming distance of the DFP vector between sample i and j, divided by the total number of accounted DFPs from all samples in comparison. DFP distance of 0 indicates complete identical on all accounted DFPs, and distance of 1 indicates complete heterogeneous on all accounted DFPs.
 
 ##### YB samples
 * YB1: 1196
