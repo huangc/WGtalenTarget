@@ -46,5 +46,6 @@
 * YB2-8 samples have in average 2.3 folds more DFPs than YB1.   
 
 ##### Summary by DFP distances (see details at VarYB_SeqDel_sum_dendrogram.png):
+* Hierarchical clustering congregates the representative cultivars into their natural varietal groups.
 * YB1 is significantly closer to the Temperate japonica representatives than YB2-8.
 * YB2-8 can be further clustered into two subgroups (YB2 YB3 YB4) and (YB5 YB6 YB7 YB8).
