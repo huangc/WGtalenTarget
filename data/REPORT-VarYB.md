@@ -46,7 +46,7 @@
 * YB2-8 samples have in average 2.3 folds more DFPs than YB1.   
 
 ##### Summary by DFP distances (see details at VarYB_SeqDel_sum_dendrogram.png):
-* The representative cultivars from four major rice varietal groups are clustered into their natural groups as expected using hierarchical clustering method.
+* The representative cultivars from four major rice varietal groups are clustered into their natural groups as expected using hierarchical clustering with complete linkage method.
 * YBs, cv. Kitake that belong to temperate japonica, are clustered into the temperate japonica.
 * YB1 is significantly closer to the temperate japonica representatives than YB2-8.
 * YB2-8 can be further clustered into two subgroups (YB2 YB3 YB4) and (YB5 YB6 YB7 YB8).
