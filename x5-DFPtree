@@ -10,6 +10,12 @@ module add python
 #  The deletions are further restricted to the genic region (giloci) with the minimal length GAP_MINSIZE_FP in order to reduce the noise 
 #  from sequencing/assembly errors on repetitive and low complexity regions.
 
+# Shared DFPs are defined as DFPs that have the exact same deletion start and end positions on the reference genome.
+# Sample DFP vector is a binary vector of sample that represents the prsence/absence of each accounted DFPs from all samples in comparison.
+# The DFP distance between sample i and j is defined as the Hamming distance of the sample DFP vector i and j, 
+# divided by the total number of accounted DFPs from all samples in comparison. 
+# DFP distance of 0 indicates complete identical on all accounted DFPs, and distance of 1 indicates complete heterogeneous on all accounted DFPs.
+
 # Input: Deletion summary table: ${data_DIR}/Seq.t_Lg${GAP_MINSIZE}.table, generated from x2-WGindelT with the content:
 # "Tname tGapStart tGapSize Samples" 
 # Methods: Filter the deletion summary table based on overlapping giloci.
