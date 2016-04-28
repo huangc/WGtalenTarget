@@ -14,6 +14,7 @@ For IU Mason cluster users, the prerequisite softwares can be loaded from the sy
 ### Anaconda
 * See https://docs.continuum.io/anaconda
 * Last update: Apr. 2016
+* numpy, scipy, matplotlib and pandas are required python packages for /bin/DFPtree.py.
 ```bash
 cd ${src_DIR}
 mkdir anaconda
