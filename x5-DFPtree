@@ -149,8 +149,6 @@ grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI | grep -v "unknown" > S
 # Tname tGapStart tGapSize tGapEnd A2_257;BINIAPAN;CHINGLIU;GINMASARI;KEYANUNIA;KOTOOURA;MANYALOJOPOIHUN;NIPPONBARE;PATIEROUGE;ARC11571;CHINGCHUNG;
 # OsjChr1 10008136 275 10008411 0;0;1;0;1;0;0;0;0;1;1;
 # We care only DFPs that are shared by at least two samples for computing the distance matrix.
-# So remove deletions that have only one sample.
-
 
 cd ${run_DIR}/iloci
 \rm Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix
@@ -181,6 +179,9 @@ done
 
 ## There appears to be an extra whitespace at the end of each line, and has to be removed for followup importing into python pandas dataframe
 sed -i 's/\s$//g' Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix
+
+## Remove deletions that have only one sample.
+awk '{     }' Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix 
 
 recSAMPLEname=`echo $SAMPLE`
 echo "Tname_tGapStart_tGapSize_tGapEnd $recSAMPLEname" | cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix > Seq.t_sum_Lg${GAP_MINSIZE_FP}.Matrix
