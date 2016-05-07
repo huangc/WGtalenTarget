@@ -141,8 +141,8 @@ echo "Tname tGapStart tGapSize tGapEnd Samples iloci" |\
 grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci | grep -v "unknown" > Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci
 
 # Remove deletions that have only one sample.
-awk '{     }' Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci
-
+\cp Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci Seq.t_sum_Lg${GAP_MINSIZE_FP}_noFilter.giloci 
+awk -F\; '{ if (NF>2) {print $0}; }' Seq.t_sum_Lg${GAP_MINSIZE_FP}_noFilter.giloci > Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci
 
 #5. Input is file Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci with the content such as:
 # Tname tGapStart tGapSize tGapEnd Samples iloci
