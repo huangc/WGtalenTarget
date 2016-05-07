@@ -187,6 +187,9 @@ echo "Tname_tGapStart_tGapSize_tGapEnd $recSAMPLEname" | cat - Seq.t_sum_Lg${GAP
 # where DM[i,j] is the hamming distance between samples feature vectors i and j.
 # Usage: DFPtree.py infile outfile
 cd ${run_DIR}/iloci
+# We care only DFPs that are shared by at least two samples for computing the distance matrix.
+
+
 python ${bin_DIR}/DFPtree.py Seq.t_sum_Lg${GAP_MINSIZE_FP}.Matrix Seq.t_sum_Lg${GAP_MINSIZE_FP}.dmx
 
 
