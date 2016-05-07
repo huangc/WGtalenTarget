@@ -11,7 +11,7 @@ module add python
 #  from sequencing/assembly errors on repetitive and low complexity regions.
 
 # Shared DFPs are defined as DFPs that have the exact same deletion start and end positions on the reference genome.
-# DFPs that are shared by at lease two samples are used in computing distance matrix.
+# Only DFPs that are shared by at lease two samples are used in computing distance matrix.
 # Sample DFP vector is a binary vector of sample that represents the prsence/absence of each accounted DFPs from all samples in comparison.
 # The DFP distance between sample i and j is defined as the Hamming distance of the sample DFP vector i and j, 
 # divided by the total number of accounted DFPs from all samples in comparison. 
