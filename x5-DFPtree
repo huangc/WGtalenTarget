@@ -144,6 +144,9 @@ grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci | grep -v "unknown" > S
 \cp Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci Seq.t_sum_Lg${GAP_MINSIZE_FP}_noFilter.giloci 
 awk -F\; '{ if (NF>2) {print $0}; }' Seq.t_sum_Lg${GAP_MINSIZE_FP}_noFilter.giloci > Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci
 
+echo "Tname tGapStart tGapSize tGapEnd Samples iloci" |\
+ cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci > Seq.t_sum_Lg${GAP_MINSIZE_FP}.gILOCI
+
 #5. Input is file Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci with the content such as:
 # Tname tGapStart tGapSize tGapEnd Samples iloci
 # OsjChr1 10008136 275 10008411 CHINGLIU;KEYANUNIA;ARC11571;CHINGCHUNG;CR441;JC_157;MADHUWAKARIA;NIAOYAO;OSATIVA; locus1510
