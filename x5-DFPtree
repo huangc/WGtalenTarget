@@ -139,7 +139,9 @@ echo "Tname tGapStart tGapSize tGapEnd Samples iloci" |\
  cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci > Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI
 
 grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.iloci | grep -v "unknown" > Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci
-grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI | grep -v "unknown" > Seq.t_sum_Lg${GAP_MINSIZE_FP}.gILOCI
+
+# Remove deletions that have only one sample.
+awk '{     }' Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci
 
 
 #5. Input is file Seq.t_sum_Lg${GAP_MINSIZE_FP}.giloci with the content such as:
@@ -179,9 +181,6 @@ done
 
 ## There appears to be an extra whitespace at the end of each line, and has to be removed for followup importing into python pandas dataframe
 sed -i 's/\s$//g' Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix
-
-## Remove deletions that have only one sample.
-awk '{     }' Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix 
 
 recSAMPLEname=`echo $SAMPLE`
 echo "Tname_tGapStart_tGapSize_tGapEnd $recSAMPLEname" | cat - Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix > Seq.t_sum_Lg${GAP_MINSIZE_FP}.Matrix
