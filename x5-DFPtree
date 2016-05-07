@@ -148,6 +148,9 @@ grep -v "intergenic" Seq.t_sum_Lg${GAP_MINSIZE_FP}.ILOCI | grep -v "unknown" > S
 # Transform the above table into a matrix sush as:
 # Tname tGapStart tGapSize tGapEnd A2_257;BINIAPAN;CHINGLIU;GINMASARI;KEYANUNIA;KOTOOURA;MANYALOJOPOIHUN;NIPPONBARE;PATIEROUGE;ARC11571;CHINGCHUNG;
 # OsjChr1 10008136 275 10008411 0;0;1;0;1;0;0;0;0;1;1;
+# We care only DFPs that are shared by at least two samples for computing the distance matrix.
+# So remove deletions that have only one sample.
+
 
 cd ${run_DIR}/iloci
 \rm Seq.t_sum_Lg${GAP_MINSIZE_FP}.matrix
@@ -187,9 +190,6 @@ echo "Tname_tGapStart_tGapSize_tGapEnd $recSAMPLEname" | cat - Seq.t_sum_Lg${GAP
 # where DM[i,j] is the hamming distance between samples feature vectors i and j.
 # Usage: DFPtree.py infile outfile
 cd ${run_DIR}/iloci
-# We care only DFPs that are shared by at least two samples for computing the distance matrix.
-
-
 python ${bin_DIR}/DFPtree.py Seq.t_sum_Lg${GAP_MINSIZE_FP}.Matrix Seq.t_sum_Lg${GAP_MINSIZE_FP}.dmx
 
 
